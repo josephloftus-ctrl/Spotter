@@ -104,7 +104,7 @@ struct SessionDetailView: View {
                     Spacer()
                     Text(String(format: "%.0f lbs", OneRepMaxCalculator.estimate(from: bestSet)))
                         .font(.spotterCaption)
-                        .foregroundStyle(.spotterPrimaryFallback)
+                        .foregroundStyle(Color.spotterPrimaryFallback)
                 }
                 .padding(.top, Spacing.xs)
             }

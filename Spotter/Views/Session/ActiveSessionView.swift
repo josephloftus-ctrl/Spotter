@@ -262,7 +262,7 @@ struct ActiveSessionView: View {
         VStack(spacing: Spacing.md) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(.spotterSuccessFallback)
+                .foregroundStyle(Color.spotterSuccessFallback)
             Text("All exercises complete!")
                 .font(.spotterHeadline)
             Text("Tap Finish to wrap up your session")

@@ -31,7 +31,7 @@ struct SettingsView: View {
                             }
                             Spacer()
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.spotterSuccessFallback)
+                                .foregroundStyle(Color.spotterSuccessFallback)
                         }
                     } else {
                         Text("No active plan")

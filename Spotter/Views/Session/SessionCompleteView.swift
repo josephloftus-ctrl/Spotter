@@ -52,7 +52,7 @@ struct SessionCompleteView: View {
         VStack(spacing: Spacing.md) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(.spotterSuccessFallback)
+                .foregroundStyle(Color.spotterSuccessFallback)
 
             if let duration = session.duration {
                 Text(DateFormatters.formatDuration(duration))

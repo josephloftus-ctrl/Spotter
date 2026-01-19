@@ -79,7 +79,7 @@ struct TodayView: View {
     private func planDayIndicator(_ planDay: PlanDay) -> some View {
         HStack {
             Image(systemName: "figure.strengthtraining.traditional")
-                .foregroundStyle(.spotterPrimaryFallback)
+                .foregroundStyle(Color.spotterPrimaryFallback)
             Text(planDay.name)
                 .font(.spotterHeadline)
             Spacer()
