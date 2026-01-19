@@ -5,8 +5,7 @@ struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(
         filter: #Predicate<Session> { $0.completedAt != nil },
-        sort: \Session.date,
-        order: .reverse
+        sort: [SortDescriptor(\Session.date, order: .reverse)]
     ) private var sessions: [Session]
 
     @State private var selectedSession: Session?

@@ -5,8 +5,7 @@ import Charts
 struct TrendsView: View {
     @Query(
         filter: #Predicate<Session> { $0.completedAt != nil },
-        sort: \Session.date,
-        order: .reverse
+        sort: [SortDescriptor(\Session.date, order: .reverse)]
     ) private var sessions: [Session]
 
     @Query private var exercises: [Exercise]
