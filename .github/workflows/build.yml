@@ -1,0 +1,69 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    - name: Build for iOS Simulator
+      run: |
+        xcodebuild clean build \
+          -project Spotter.xcodeproj \
+          -scheme Spotter \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
+          -configuration Debug \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Build Archive (Unsigned)
+      run: |
+        xcodebuild archive \
+          -project Spotter.xcodeproj \
+          -scheme Spotter \
+          -archivePath build/Spotter.xcarchive \
+          -destination 'generic/platform=iOS' \
+          -configuration Release \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          DEVELOPMENT_TEAM="" \
+          PROVISIONING_PROFILE_SPECIFIER=""
+
+    - name: Create Unsigned IPA
+      run: |
+        mkdir -p build/Payload
+        cp -r build/Spotter.xcarchive/Products/Applications/Spotter.app build/Payload/
+        cd build
+        zip -r Spotter-unsigned.ipa Payload
+        rm -rf Payload
+
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Spotter-unsigned-ipa
+        path: build/Spotter-unsigned.ipa
+        retention-days: 30
+
+    - name: Upload Archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: Spotter-xcarchive
+        path: build/Spotter.xcarchive
+        retention-days: 30

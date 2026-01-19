@@ -1,0 +1,174 @@
+{
+  "exercises": [
+    {
+      "name": "Back Squat",
+      "modality": "barbell",
+      "muscleGroups": ["quadriceps", "glutes", "hamstrings"]
+    },
+    {
+      "name": "Front Squat",
+      "modality": "barbell",
+      "muscleGroups": ["quadriceps", "core", "upper back"]
+    },
+    {
+      "name": "Deadlift",
+      "modality": "barbell",
+      "muscleGroups": ["hamstrings", "glutes", "lower back", "traps"]
+    },
+    {
+      "name": "Romanian Deadlift",
+      "modality": "barbell",
+      "muscleGroups": ["hamstrings", "glutes", "lower back"]
+    },
+    {
+      "name": "Bench Press",
+      "modality": "barbell",
+      "muscleGroups": ["chest", "triceps", "shoulders"]
+    },
+    {
+      "name": "Overhead Press",
+      "modality": "barbell",
+      "muscleGroups": ["shoulders", "triceps", "upper chest"]
+    },
+    {
+      "name": "Barbell Row",
+      "modality": "barbell",
+      "muscleGroups": ["lats", "rhomboids", "biceps"]
+    },
+    {
+      "name": "Hip Thrust",
+      "modality": "barbell",
+      "muscleGroups": ["glutes", "hamstrings"]
+    },
+    {
+      "name": "Dumbbell Press",
+      "modality": "dumbbell",
+      "muscleGroups": ["chest", "triceps", "shoulders"]
+    },
+    {
+      "name": "Incline Dumbbell Press",
+      "modality": "dumbbell",
+      "muscleGroups": ["upper chest", "shoulders", "triceps"]
+    },
+    {
+      "name": "Dumbbell Row",
+      "modality": "dumbbell",
+      "muscleGroups": ["lats", "rhomboids", "biceps"]
+    },
+    {
+      "name": "Lateral Raise",
+      "modality": "dumbbell",
+      "muscleGroups": ["shoulders"]
+    },
+    {
+      "name": "Dumbbell Curl",
+      "modality": "dumbbell",
+      "muscleGroups": ["biceps"]
+    },
+    {
+      "name": "Dumbbell Tricep Extension",
+      "modality": "dumbbell",
+      "muscleGroups": ["triceps"]
+    },
+    {
+      "name": "Goblet Squat",
+      "modality": "dumbbell",
+      "muscleGroups": ["quadriceps", "glutes"]
+    },
+    {
+      "name": "Dumbbell Lunges",
+      "modality": "dumbbell",
+      "muscleGroups": ["quadriceps", "glutes", "hamstrings"]
+    },
+    {
+      "name": "Cable Fly",
+      "modality": "cable",
+      "muscleGroups": ["chest"]
+    },
+    {
+      "name": "Tricep Pushdown",
+      "modality": "cable",
+      "muscleGroups": ["triceps"]
+    },
+    {
+      "name": "Face Pull",
+      "modality": "cable",
+      "muscleGroups": ["rear delts", "rhomboids", "traps"]
+    },
+    {
+      "name": "Cable Curl",
+      "modality": "cable",
+      "muscleGroups": ["biceps"]
+    },
+    {
+      "name": "Lat Pulldown",
+      "modality": "cable",
+      "muscleGroups": ["lats", "biceps"]
+    },
+    {
+      "name": "Seated Cable Row",
+      "modality": "cable",
+      "muscleGroups": ["lats", "rhomboids", "biceps"]
+    },
+    {
+      "name": "Leg Press",
+      "modality": "machine",
+      "muscleGroups": ["quadriceps", "glutes"]
+    },
+    {
+      "name": "Leg Curl",
+      "modality": "machine",
+      "muscleGroups": ["hamstrings"]
+    },
+    {
+      "name": "Leg Extension",
+      "modality": "machine",
+      "muscleGroups": ["quadriceps"]
+    },
+    {
+      "name": "Chest Press Machine",
+      "modality": "machine",
+      "muscleGroups": ["chest", "triceps"]
+    },
+    {
+      "name": "Shoulder Press Machine",
+      "modality": "machine",
+      "muscleGroups": ["shoulders", "triceps"]
+    },
+    {
+      "name": "Seated Row Machine",
+      "modality": "machine",
+      "muscleGroups": ["lats", "rhomboids"]
+    },
+    {
+      "name": "Pull-up",
+      "modality": "bodyweight",
+      "muscleGroups": ["lats", "biceps", "core"]
+    },
+    {
+      "name": "Chin-up",
+      "modality": "bodyweight",
+      "muscleGroups": ["biceps", "lats"]
+    },
+    {
+      "name": "Dip",
+      "modality": "bodyweight",
+      "muscleGroups": ["chest", "triceps", "shoulders"]
+    },
+    {
+      "name": "Push-up",
+      "modality": "bodyweight",
+      "muscleGroups": ["chest", "triceps", "shoulders"]
+    },
+    {
+      "name": "Inverted Row",
+      "modality": "bodyweight",
+      "muscleGroups": ["lats", "rhomboids", "biceps"]
+    },
+    {
+      "name": "Plank",
+      "modality": "bodyweight",
+      "muscleGroups": ["core"]
+    }
+  ]
+}
