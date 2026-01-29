@@ -15,8 +15,12 @@ struct ActiveSessionView: View {
     @State private var selectedRPE: Int? = nil
     @State private var startTime = Date()
     @State private var showingSessionComplete = false
+    @State private var showingExercisePicker = false
 
-    @Query private var exercises: [Exercise]
+    // For quick sessions - exercises added on the fly
+    @State private var quickSessionExercises: [Exercise] = []
+
+    @Query(sort: \Exercise.name) private var exercises: [Exercise]
 
     init(planDay: PlanDay?) {
         self.planDay = planDay
@@ -25,18 +29,41 @@ struct ActiveSessionView: View {
         ))
     }
 
+    private var isQuickSession: Bool {
+        planDay == nil
+    }
+
     private var plannedExercises: [PlannedExercise] {
         planDay?.sortedExercises ?? []
     }
 
     private var currentPlannedExercise: PlannedExercise? {
+        guard !isQuickSession else { return nil }
         guard currentExerciseIndex < plannedExercises.count else { return nil }
         return plannedExercises[currentExerciseIndex]
     }
 
+    private var currentQuickExercise: Exercise? {
+        guard isQuickSession else { return nil }
+        guard currentExerciseIndex < quickSessionExercises.count else { return nil }
+        return quickSessionExercises[currentExerciseIndex]
+    }
+
+    private var currentExerciseName: String? {
+        if isQuickSession {
+            return currentQuickExercise?.name
+        } else {
+            return currentPlannedExercise?.exerciseName
+        }
+    }
+
+    private var hasCurrentExercise: Bool {
+        currentExerciseName != nil
+    }
+
     private var setsForCurrentExercise: [SetEntry] {
-        guard let exerciseName = currentPlannedExercise?.exerciseName else { return [] }
-        return session.sets.filter { $0.exercise?.name == exerciseName }
+        guard let name = currentExerciseName else { return [] }
+        return session.sets.filter { $0.exercise?.name == name }
     }
 
     private var targetSets: Int {
@@ -54,16 +81,25 @@ struct ActiveSessionView: View {
 
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
-                        // Current Exercise
-                        if let exercise = currentPlannedExercise {
-                            currentExerciseSection(exercise)
-                        } else {
-                            noExercisesView
-                        }
+                        if hasCurrentExercise {
+                            // Current Exercise
+                            currentExerciseSection
 
-                        // Completed Sets
-                        if !setsForCurrentExercise.isEmpty {
-                            completedSetsSection
+                            // Completed Sets
+                            if !setsForCurrentExercise.isEmpty {
+                                completedSetsSection
+                            }
+
+                            // Quick session: buttons to navigate or add more
+                            if isQuickSession {
+                                quickSessionControls
+                            }
+                        } else if isQuickSession {
+                            // No exercise selected yet - prompt to add one
+                            addExercisePrompt
+                        } else {
+                            // Plan complete
+                            noExercisesView
                         }
                     }
                     .padding(Spacing.md)
@@ -73,7 +109,9 @@ struct ActiveSessionView: View {
                     .foregroundStyle(Color.spotterBorder)
 
                 // Log Set Button
-                logSetButton
+                if hasCurrentExercise {
+                    logSetButton
+                }
             }
             .background(Color.spotterBackground)
             .navigationTitle(planDay?.name ?? "Quick Session")
@@ -88,11 +126,17 @@ struct ActiveSessionView: View {
                     Button("Finish") {
                         finishSession()
                     }
+                    .disabled(session.sets.isEmpty)
                 }
             }
             .sheet(isPresented: $showingSessionComplete) {
                 SessionCompleteView(session: session) {
                     dismiss()
+                }
+            }
+            .sheet(isPresented: $showingExercisePicker) {
+                ExercisePickerView(exercises: exercises) { exercise in
+                    addQuickExercise(exercise)
                 }
             }
             .onAppear {
@@ -128,18 +172,24 @@ struct ActiveSessionView: View {
         DateFormatters.formatDuration(Date().timeIntervalSince(startTime))
     }
 
-    private func currentExerciseSection(_ exercise: PlannedExercise) -> some View {
+    private var currentExerciseSection: some View {
         VStack(spacing: Spacing.lg) {
             // Exercise Name
             VStack(spacing: Spacing.xs) {
-                Text(exercise.exerciseName)
+                Text(currentExerciseName ?? "")
                     .font(.spotterTitle)
                     .foregroundStyle(Color.spotterText)
 
                 // Set Counter
-                Text("Set \(currentSetNumber) of \(targetSets)")
-                    .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterTextSecondary)
+                if isQuickSession {
+                    Text("Set \(setsForCurrentExercise.count + 1)")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextSecondary)
+                } else {
+                    Text("Set \(currentSetNumber) of \(targetSets)")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextSecondary)
+                }
             }
 
             Divider()
@@ -295,6 +345,76 @@ struct ActiveSessionView: View {
         )
     }
 
+    private var quickSessionControls: some View {
+        HStack(spacing: Spacing.md) {
+            // Previous exercise
+            if currentExerciseIndex > 0 {
+                Button {
+                    currentExerciseIndex -= 1
+                    selectedRPE = nil
+                    HapticManager.selection()
+                } label: {
+                    Label("Previous", systemImage: "chevron.left")
+                        .font(.spotterBody)
+                        .foregroundStyle(Color.spotterPrimary)
+                }
+            }
+
+            Spacer()
+
+            // Next exercise or add new
+            if currentExerciseIndex < quickSessionExercises.count - 1 {
+                Button {
+                    currentExerciseIndex += 1
+                    selectedRPE = nil
+                    HapticManager.selection()
+                } label: {
+                    Label("Next", systemImage: "chevron.right")
+                        .font(.spotterBody)
+                        .foregroundStyle(Color.spotterPrimary)
+                }
+            } else {
+                Button {
+                    showingExercisePicker = true
+                } label: {
+                    Label("Add Exercise", systemImage: "plus")
+                        .font(.spotterBody)
+                        .foregroundStyle(Color.spotterPrimary)
+                }
+            }
+        }
+        .padding(.horizontal, Spacing.sm)
+    }
+
+    private var addExercisePrompt: some View {
+        VStack(spacing: Spacing.lg) {
+            Image(systemName: "dumbbell")
+                .font(.system(size: 48))
+                .foregroundStyle(Color.spotterTextSecondary)
+
+            Text("Start your workout")
+                .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
+
+            Text("Add an exercise to begin logging sets")
+                .font(.spotterCaption)
+                .foregroundStyle(Color.spotterTextSecondary)
+
+            Button {
+                showingExercisePicker = true
+            } label: {
+                Label("Add Exercise", systemImage: "plus")
+                    .font(.spotterHeadline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, Spacing.lg)
+                    .padding(.vertical, Spacing.md)
+                    .background(Color.spotterPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+            }
+        }
+        .padding(Spacing.xl)
+    }
+
     private var noExercisesView: some View {
         VStack(spacing: Spacing.md) {
             Image(systemName: "checkmark.circle")
@@ -323,15 +443,18 @@ struct ActiveSessionView: View {
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
         }
         .padding(Spacing.md)
-        .disabled(currentPlannedExercise == nil)
-        .opacity(currentPlannedExercise == nil ? Opacity.muted : 1)
     }
 
     private func logSet() {
-        guard let plannedExercise = currentPlannedExercise else { return }
+        let exercise: Exercise
 
-        // Find or create exercise
-        let exercise = findOrCreateExercise(named: plannedExercise.exerciseName)
+        if isQuickSession {
+            guard let quickExercise = currentQuickExercise else { return }
+            exercise = quickExercise
+        } else {
+            guard let plannedExercise = currentPlannedExercise else { return }
+            exercise = findOrCreateExercise(named: plannedExercise.exerciseName)
+        }
 
         // Create set entry
         let setEntry = SetEntry(
@@ -346,18 +469,30 @@ struct ActiveSessionView: View {
         session.sets.append(setEntry)
         HapticManager.logSet()
 
-        // Advance to next set or exercise
-        if currentSetNumber >= targetSets {
-            currentSetNumber = 1
-            currentExerciseIndex += 1
-            selectedRPE = nil
+        // For planned sessions, advance to next set or exercise
+        if !isQuickSession {
+            if currentSetNumber >= targetSets {
+                currentSetNumber = 1
+                currentExerciseIndex += 1
+                selectedRPE = nil
 
-            if currentExerciseIndex >= plannedExercises.count {
-                HapticManager.completeExercise()
+                if currentExerciseIndex >= plannedExercises.count {
+                    HapticManager.completeExercise()
+                }
+            } else {
+                currentSetNumber += 1
             }
         } else {
-            currentSetNumber += 1
+            // For quick sessions, just reset RPE
+            selectedRPE = nil
         }
+    }
+
+    private func addQuickExercise(_ exercise: Exercise) {
+        quickSessionExercises.append(exercise)
+        currentExerciseIndex = quickSessionExercises.count - 1
+        selectedRPE = nil
+        HapticManager.selection()
     }
 
     private func findOrCreateExercise(named name: String) -> Exercise {
@@ -373,6 +508,72 @@ struct ActiveSessionView: View {
     private func finishSession() {
         session.duration = Date().timeIntervalSince(startTime)
         showingSessionComplete = true
+    }
+}
+
+// MARK: - Exercise Picker
+
+struct ExercisePickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let exercises: [Exercise]
+    let onSelect: (Exercise) -> Void
+
+    @State private var searchText = ""
+
+    private var filteredExercises: [Exercise] {
+        if searchText.isEmpty {
+            return exercises
+        }
+        return exercises.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
+    private var groupedExercises: [(ExerciseModality, [Exercise])] {
+        let grouped = Dictionary(grouping: filteredExercises) { $0.modality }
+        return grouped.sorted { $0.key.displayName < $1.key.displayName }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(groupedExercises, id: \.0) { modality, exercises in
+                    Section(modality.displayName) {
+                        ForEach(exercises) { exercise in
+                            Button {
+                                onSelect(exercise)
+                                dismiss()
+                            } label: {
+                                HStack {
+                                    Image(systemName: exercise.modality.icon)
+                                        .foregroundStyle(Color.spotterTextSecondary)
+
+                                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                                        Text(exercise.name)
+                                            .font(.spotterBody)
+                                            .foregroundStyle(Color.spotterText)
+
+                                        if !exercise.muscleGroups.isEmpty {
+                                            Text(exercise.muscleGroups.joined(separator: ", "))
+                                                .font(.spotterCaption)
+                                                .foregroundStyle(Color.spotterTextSecondary)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .searchable(text: $searchText, prompt: "Search exercises")
+            .navigationTitle("Add Exercise")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 
