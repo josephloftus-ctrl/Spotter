@@ -57,8 +57,6 @@ struct ExerciseLibraryView: View {
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.spotterBackground)
             .searchable(text: $searchText, prompt: "Search exercises")
             .navigationTitle("Exercise Library")
             .navigationBarTitleDisplayMode(.inline)
@@ -158,8 +156,6 @@ struct AddExerciseView: View {
                 TextField("Notes", text: $notes, axis: .vertical)
                     .lineLimit(2...4)
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.spotterBackground)
             .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

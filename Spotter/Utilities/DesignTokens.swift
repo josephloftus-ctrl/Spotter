@@ -7,9 +7,9 @@ extension Color {
     static let spotterPrimary = Color(hex: "64748B")        // Slate-500: muted blue-gray
     static let spotterPrimaryHover = Color(hex: "475569")   // Slate-600: pressed states
 
-    // Backgrounds - clean, minimal
-    static let spotterBackground = Color(hex: "FAFAFA")     // Near-white
-    static let spotterSurface = Color(hex: "F1F5F9")        // Slate-100: subtle cards (use sparingly)
+    // Backgrounds - warm, not clinical
+    static let spotterBackground = Color(hex: "F8FAFC")     // Slate-50: subtle warmth
+    static let spotterSurface = Color(hex: "F1F5F9")        // Slate-100: card backgrounds
 
     // Text - readable, not harsh
     static let spotterText = Color(hex: "1E293B")           // Slate-800: primary text

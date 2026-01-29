@@ -43,6 +43,9 @@ struct LastSessionCard: View {
             }
             .padding(.top, Spacing.xs)
         }
+        .padding(Spacing.md)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func statItem(value: String, label: String) -> some View {

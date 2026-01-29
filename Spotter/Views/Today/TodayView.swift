@@ -44,9 +44,6 @@ struct TodayView: View {
                         planDayIndicator(planDay)
                     }
 
-                    Divider()
-                        .foregroundStyle(Color.spotterBorder)
-
                     // Last Session
                     if let session = lastSession {
                         LastSessionCard(session: session)
@@ -91,7 +88,11 @@ struct TodayView: View {
             Text(planDay.name)
                 .font(.spotterHeadline)
                 .foregroundStyle(Color.spotterText)
+            Spacer()
         }
+        .padding(Spacing.md)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var startSessionButton: some View {
@@ -101,13 +102,11 @@ struct TodayView: View {
         } label: {
             Text("Start Session")
                 .font(.spotterHeadline)
-                .foregroundStyle(Color.spotterPrimary)
+                .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(Spacing.md)
-                .background(
-                    RoundedRectangle(cornerRadius: CornerRadius.md)
-                        .strokeBorder(Color.spotterPrimary, lineWidth: BorderWidth.medium)
-                )
+                .background(Color.spotterPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
         }
     }
 }

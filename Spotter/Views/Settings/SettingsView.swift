@@ -81,8 +81,6 @@ struct SettingsView: View {
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.spotterBackground)
             .navigationTitle("Settings")
             .fullScreenCover(isPresented: $showingPlanSetup) {
                 PlanSetupView()

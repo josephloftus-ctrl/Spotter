@@ -15,6 +15,9 @@ struct TodaySessionCard: View {
                 }
             }
         }
+        .padding(Spacing.md)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func exerciseRow(_ exercise: PlannedExercise) -> some View {

@@ -53,8 +53,6 @@ struct PlanSetupView: View {
                         .lineLimit(3...6)
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.spotterBackground)
             .navigationTitle("Create Plan")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

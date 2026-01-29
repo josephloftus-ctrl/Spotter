@@ -97,7 +97,10 @@ struct TrendsView: View {
                 }
             }
         }
+        .padding(Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var exercisePicker: some View {
@@ -173,10 +176,8 @@ struct TrendsView: View {
             }
         }
         .padding(Spacing.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: CornerRadius.md)
-                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-        )
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var weeklyVolumeCard: some View {
@@ -213,10 +214,8 @@ struct TrendsView: View {
             }
         }
         .padding(Spacing.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: CornerRadius.md)
-                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-        )
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 }
 

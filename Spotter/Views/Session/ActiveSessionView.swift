@@ -158,6 +158,8 @@ struct ActiveSessionView: View {
             rpeSelector
         }
         .padding(Spacing.md)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var weightStepper: some View {
