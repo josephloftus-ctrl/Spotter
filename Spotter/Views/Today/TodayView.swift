@@ -44,7 +44,10 @@ struct TodayView: View {
                         planDayIndicator(planDay)
                     }
 
-                    // Last Session Card
+                    Divider()
+                        .foregroundStyle(Color.spotterBorder)
+
+                    // Last Session
                     if let session = lastSession {
                         LastSessionCard(session: session)
                     }
@@ -54,11 +57,14 @@ struct TodayView: View {
                         TodaySessionCard(planDay: planDay)
                     }
 
+                    Spacer(minLength: Spacing.lg)
+
                     // Start Session Button
                     startSessionButton
                 }
-                .padding()
+                .padding(Spacing.md)
             }
+            .background(Color.spotterBackground)
             .navigationTitle("Today")
             .fullScreenCover(isPresented: $showingActiveSession) {
                 ActiveSessionView(planDay: nextPlanDay)
@@ -70,23 +76,22 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Text(DateFormatters.dayOfWeek.string(from: Date()))
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
             Text(DateFormatters.shortDate.string(from: Date()))
                 .font(.spotterTitle)
+                .foregroundStyle(Color.spotterText)
         }
+        .padding(.top, Spacing.sm)
     }
 
     private func planDayIndicator(_ planDay: PlanDay) -> some View {
-        HStack {
+        HStack(spacing: Spacing.sm) {
             Image(systemName: "figure.strengthtraining.traditional")
-                .foregroundStyle(Color.spotterPrimaryFallback)
+                .foregroundStyle(Color.spotterPrimary)
             Text(planDay.name)
                 .font(.spotterHeadline)
-            Spacer()
+                .foregroundStyle(Color.spotterText)
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var startSessionButton: some View {
@@ -96,11 +101,13 @@ struct TodayView: View {
         } label: {
             Text("Start Session")
                 .font(.spotterHeadline)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.spotterPrimary)
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.spotterPrimaryFallback)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+                .padding(Spacing.md)
+                .background(
+                    RoundedRectangle(cornerRadius: CornerRadius.md)
+                        .strokeBorder(Color.spotterPrimary, lineWidth: BorderWidth.medium)
+                )
         }
     }
 }

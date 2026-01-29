@@ -24,6 +24,7 @@ struct ContentView: View {
                     Label("Settings", systemImage: "gear")
                 }
         }
+        .tint(Color.spotterPrimary)
     }
 }
 

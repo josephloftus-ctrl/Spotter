@@ -13,14 +13,18 @@ struct HistoryView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 0) {
                 // View Toggle
                 Picker("View", selection: $showingCalendar) {
                     Text("Calendar").tag(true)
                     Text("List").tag(false)
                 }
                 .pickerStyle(.segmented)
-                .padding(.horizontal)
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.sm)
+
+                Divider()
+                    .foregroundStyle(Color.spotterBorder)
 
                 if showingCalendar {
                     CalendarView(sessions: sessions, selectedSession: $selectedSession)
@@ -28,6 +32,7 @@ struct HistoryView: View {
                     sessionList
                 }
             }
+            .background(Color.spotterBackground)
             .navigationTitle("History")
             .sheet(item: $selectedSession) { session in
                 SessionDetailView(session: session)
@@ -36,16 +41,21 @@ struct HistoryView: View {
     }
 
     private var sessionList: some View {
-        List {
-            ForEach(sessions) { session in
-                SessionRowView(session: session)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedSession = session
-                    }
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(sessions) { session in
+                    SessionRowView(session: session)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedSession = session
+                        }
+
+                    Divider()
+                        .foregroundStyle(Color.spotterBorder)
+                }
             }
+            .padding(.horizontal, Spacing.md)
         }
-        .listStyle(.plain)
     }
 }
 
@@ -57,11 +67,12 @@ struct SessionRowView: View {
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(DateFormatters.formatRelativeDate(session.date))
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
 
                 if let planDayName = session.planDayName {
                     Text(planDayName)
                         .font(.spotterCaption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.spotterTextSecondary)
                 }
             }
 
@@ -71,7 +82,7 @@ struct SessionRowView: View {
                 if let duration = session.duration {
                     Text(DateFormatters.formatDuration(duration))
                         .font(.spotterCaption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.spotterTextSecondary)
                 }
 
                 if let rpe = session.sessionRPE {
@@ -79,7 +90,7 @@ struct SessionRowView: View {
                 }
             }
         }
-        .padding(.vertical, Spacing.sm)
+        .padding(.vertical, Spacing.md)
     }
 
     private func rpeEmoji(_ rpe: Int) -> String {

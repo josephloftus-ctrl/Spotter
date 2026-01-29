@@ -6,28 +6,28 @@ struct TodaySessionCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Today's Plan")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
-            ForEach(planDay.sortedExercises) { exercise in
-                exerciseRow(exercise)
+            VStack(spacing: 0) {
+                ForEach(planDay.sortedExercises) { exercise in
+                    exerciseRow(exercise)
+                }
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func exerciseRow(_ exercise: PlannedExercise) -> some View {
         HStack {
             Text(exercise.exerciseName)
                 .font(.spotterBody)
+                .foregroundStyle(Color.spotterText)
             Spacer()
             Text(exercise.displayPrescription)
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
         }
-        .padding(.vertical, Spacing.xs)
+        .padding(.vertical, Spacing.sm)
     }
 }
 

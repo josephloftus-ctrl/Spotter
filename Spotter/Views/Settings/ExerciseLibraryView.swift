@@ -42,6 +42,7 @@ struct ExerciseLibraryView: View {
                                 filterChip(modality, label: modality.displayName)
                             }
                         }
+                        .padding(.horizontal, Spacing.md)
                     }
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
@@ -56,6 +57,8 @@ struct ExerciseLibraryView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.spotterBackground)
             .searchable(text: $searchText, prompt: "Search exercises")
             .navigationTitle("Exercise Library")
             .navigationBarTitleDisplayMode(.inline)
@@ -64,12 +67,14 @@ struct ExerciseLibraryView: View {
                     Button("Done") {
                         dismiss()
                     }
+                    .foregroundStyle(Color.spotterPrimary)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showingAddExercise = true
                     } label: {
                         Image(systemName: "plus")
+                            .foregroundStyle(Color.spotterPrimary)
                     }
                 }
             }
@@ -88,25 +93,32 @@ struct ExerciseLibraryView: View {
                 .font(.spotterCaption)
                 .padding(.horizontal, Spacing.md)
                 .padding(.vertical, Spacing.sm)
-                .background(selectedModality == modality ? Color.spotterPrimaryFallback : Color.spotterSurfaceFallback)
-                .foregroundStyle(selectedModality == modality ? .white : .primary)
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                .background(
+                    RoundedRectangle(cornerRadius: CornerRadius.sm)
+                        .fill(selectedModality == modality ? Color.spotterPrimary : Color.clear)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: CornerRadius.sm)
+                        .strokeBorder(selectedModality == modality ? Color.clear : Color.spotterBorder, lineWidth: BorderWidth.thin)
+                )
+                .foregroundStyle(selectedModality == modality ? .white : Color.spotterText)
         }
     }
 
     private func exerciseRow(_ exercise: Exercise) -> some View {
         HStack {
             Image(systemName: exercise.modality.icon)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(exercise.name)
                     .font(.spotterBody)
+                    .foregroundStyle(Color.spotterText)
 
                 if !exercise.muscleGroups.isEmpty {
                     Text(exercise.muscleGroups.joined(separator: ", "))
                         .font(.spotterCaption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.spotterTextSecondary)
                 }
             }
 
@@ -115,7 +127,7 @@ struct ExerciseLibraryView: View {
             if exercise.isCustom {
                 Text("Custom")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
             }
         }
     }
@@ -146,6 +158,8 @@ struct AddExerciseView: View {
                 TextField("Notes", text: $notes, axis: .vertical)
                     .lineLimit(2...4)
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.spotterBackground)
             .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -153,12 +167,14 @@ struct AddExerciseView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundStyle(Color.spotterPrimary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         saveExercise()
                     }
                     .disabled(name.isEmpty)
+                    .foregroundStyle(name.isEmpty ? Color.spotterTextSecondary : Color.spotterPrimary)
                 }
             }
         }

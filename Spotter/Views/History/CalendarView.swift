@@ -45,12 +45,14 @@ struct CalendarView: View {
                     displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth)!
                 } label: {
                     Image(systemName: "chevron.left")
+                        .foregroundStyle(Color.spotterPrimary)
                 }
 
                 Spacer()
 
                 Text(DateFormatters.monthYear.string(from: displayedMonth))
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
 
                 Spacer()
 
@@ -58,16 +60,17 @@ struct CalendarView: View {
                     displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth)!
                 } label: {
                     Image(systemName: "chevron.right")
+                        .foregroundStyle(Color.spotterPrimary)
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, Spacing.md)
 
             // Day Headers
             HStack {
                 ForEach(daysOfWeek, id: \.self) { day in
                     Text(day)
                         .font(.spotterCaption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.spotterTextSecondary)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -79,14 +82,14 @@ struct CalendarView: View {
                         dayCell(for: date)
                     } else {
                         Color.clear
-                            .frame(height: 40)
+                            .frame(height: 44)
                     }
                 }
             }
 
             Spacer()
         }
-        .padding()
+        .padding(Spacing.md)
     }
 
     private func dayCell(for date: Date) -> some View {
@@ -103,11 +106,11 @@ struct CalendarView: View {
             VStack(spacing: 2) {
                 Text("\(calendar.component(.day, from: date))")
                     .font(.spotterBody)
-                    .foregroundStyle(isToday ? .white : .primary)
+                    .foregroundStyle(isToday ? .white : Color.spotterText)
 
                 if hasSession {
                     Circle()
-                        .fill(Color.spotterPrimaryFallback)
+                        .fill(isToday ? .white : Color.spotterPrimary)
                         .frame(width: 6, height: 6)
                 } else {
                     Circle()
@@ -116,8 +119,8 @@ struct CalendarView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 40)
-            .background(isToday ? Color.spotterPrimaryFallback : Color.clear)
+            .frame(height: 44)
+            .background(isToday ? Color.spotterPrimary : Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
         }
         .disabled(!hasSession)

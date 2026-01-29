@@ -50,6 +50,7 @@ struct ActiveSessionView: View {
                 sessionHeader
 
                 Divider()
+                    .foregroundStyle(Color.spotterBorder)
 
                 ScrollView {
                     VStack(spacing: Spacing.lg) {
@@ -65,14 +66,16 @@ struct ActiveSessionView: View {
                             completedSetsSection
                         }
                     }
-                    .padding()
+                    .padding(Spacing.md)
                 }
 
                 Divider()
+                    .foregroundStyle(Color.spotterBorder)
 
                 // Log Set Button
                 logSetButton
             }
+            .background(Color.spotterBackground)
             .navigationTitle(planDay?.name ?? "Quick Session")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -100,23 +103,25 @@ struct ActiveSessionView: View {
 
     private var sessionHeader: some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text("Elapsed")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
                 Text(elapsedTime)
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
             }
             Spacer()
-            VStack(alignment: .trailing) {
+            VStack(alignment: .trailing, spacing: Spacing.xs) {
                 Text("Sets Logged")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
                 Text("\(session.sets.count)")
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
             }
         }
-        .padding()
+        .padding(Spacing.md)
     }
 
     private var elapsedTime: String {
@@ -124,15 +129,21 @@ struct ActiveSessionView: View {
     }
 
     private func currentExerciseSection(_ exercise: PlannedExercise) -> some View {
-        VStack(spacing: Spacing.md) {
+        VStack(spacing: Spacing.lg) {
             // Exercise Name
-            Text(exercise.exerciseName)
-                .font(.spotterTitle)
+            VStack(spacing: Spacing.xs) {
+                Text(exercise.exerciseName)
+                    .font(.spotterTitle)
+                    .foregroundStyle(Color.spotterText)
 
-            // Set Counter
-            Text("Set \(currentSetNumber) of \(targetSets)")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                // Set Counter
+                Text("Set \(currentSetNumber) of \(targetSets)")
+                    .font(.spotterCaption)
+                    .foregroundStyle(Color.spotterTextSecondary)
+            }
+
+            Divider()
+                .foregroundStyle(Color.spotterBorder)
 
             // Weight Stepper
             weightStepper
@@ -140,12 +151,13 @@ struct ActiveSessionView: View {
             // Reps Stepper
             repsStepper
 
+            Divider()
+                .foregroundStyle(Color.spotterBorder)
+
             // RPE Selector
             rpeSelector
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.md)
     }
 
     private var weightStepper: some View {
@@ -154,16 +166,18 @@ struct ActiveSessionView: View {
                 weight = max(0, weight - 5)
                 HapticManager.selection()
             } label: {
-                Image(systemName: "minus.circle.fill")
+                Image(systemName: "minus.circle")
                     .font(.title)
+                    .foregroundStyle(Color.spotterPrimary)
             }
 
-            VStack {
+            VStack(spacing: Spacing.xs) {
                 Text("\(Int(weight))")
                     .font(.spotterLargeNumber)
+                    .foregroundStyle(Color.spotterText)
                 Text("lbs")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
             }
             .frame(minWidth: 120)
 
@@ -171,8 +185,9 @@ struct ActiveSessionView: View {
                 weight += 5
                 HapticManager.selection()
             } label: {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "plus.circle")
                     .font(.title)
+                    .foregroundStyle(Color.spotterPrimary)
             }
         }
     }
@@ -183,16 +198,18 @@ struct ActiveSessionView: View {
                 reps = max(1, reps - 1)
                 HapticManager.selection()
             } label: {
-                Image(systemName: "minus.circle.fill")
+                Image(systemName: "minus.circle")
                     .font(.title)
+                    .foregroundStyle(Color.spotterPrimary)
             }
 
-            VStack {
+            VStack(spacing: Spacing.xs) {
                 Text("\(reps)")
                     .font(.spotterLargeNumber)
+                    .foregroundStyle(Color.spotterText)
                 Text("reps")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
             }
             .frame(minWidth: 120)
 
@@ -200,8 +217,9 @@ struct ActiveSessionView: View {
                 reps += 1
                 HapticManager.selection()
             } label: {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "plus.circle")
                     .font(.title)
+                    .foregroundStyle(Color.spotterPrimary)
             }
         }
     }
@@ -210,7 +228,7 @@ struct ActiveSessionView: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("RPE (optional)")
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             HStack(spacing: Spacing.sm) {
                 ForEach([6, 7, 8, 9, 10], id: \.self) { rpe in
@@ -222,9 +240,15 @@ struct ActiveSessionView: View {
                             .font(.spotterBody)
                             .padding(.horizontal, Spacing.md)
                             .padding(.vertical, Spacing.sm)
-                            .background(selectedRPE == rpe ? Color.spotterPrimaryFallback : Color.spotterSurfaceFallback)
-                            .foregroundStyle(selectedRPE == rpe ? .white : .primary)
-                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                            .background(
+                                RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                    .fill(selectedRPE == rpe ? Color.spotterPrimary : Color.clear)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                    .strokeBorder(Color.spotterBorder, lineWidth: selectedRPE == rpe ? 0 : BorderWidth.thin)
+                            )
+                            .foregroundStyle(selectedRPE == rpe ? .white : Color.spotterText)
                     }
                 }
             }
@@ -234,42 +258,54 @@ struct ActiveSessionView: View {
     private var completedSetsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Completed Sets")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
-            ForEach(Array(setsForCurrentExercise.enumerated()), id: \.element.id) { index, set in
-                HStack {
-                    Text("Set \(index + 1)")
-                        .font(.spotterBody)
-                    Spacer()
-                    Text("\(set.displayWeight) × \(set.reps)")
-                        .font(.spotterBody)
-                    if let rpe = set.rpe {
-                        Text("@\(rpe)")
-                            .font(.spotterCaption)
-                            .foregroundStyle(.secondary)
+            VStack(spacing: 0) {
+                ForEach(Array(setsForCurrentExercise.enumerated()), id: \.element.id) { index, set in
+                    HStack {
+                        Text("Set \(index + 1)")
+                            .font(.spotterBody)
+                            .foregroundStyle(Color.spotterTextSecondary)
+                        Spacer()
+                        Text("\(set.displayWeight) × \(set.reps)")
+                            .font(.spotterBody)
+                            .foregroundStyle(Color.spotterText)
+                        if let rpe = set.rpe {
+                            Text("@\(rpe)")
+                                .font(.spotterCaption)
+                                .foregroundStyle(Color.spotterTextSecondary)
+                        }
+                    }
+                    .padding(.vertical, Spacing.sm)
+
+                    if index < setsForCurrentExercise.count - 1 {
+                        Divider()
+                            .foregroundStyle(Color.spotterBorder)
                     }
                 }
-                .padding(.vertical, Spacing.xs)
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.md)
+                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+        )
     }
 
     private var noExercisesView: some View {
         VStack(spacing: Spacing.md) {
-            Image(systemName: "checkmark.circle.fill")
+            Image(systemName: "checkmark.circle")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.spotterSuccessFallback)
+                .foregroundStyle(Color.spotterSuccess)
             Text("All exercises complete!")
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
             Text("Tap Finish to wrap up your session")
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
         }
-        .padding()
+        .padding(Spacing.lg)
     }
 
     private var logSetButton: some View {
@@ -280,12 +316,13 @@ struct ActiveSessionView: View {
                 .font(.spotterHeadline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.spotterPrimaryFallback)
+                .padding(Spacing.md)
+                .background(Color.spotterPrimary)
                 .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
         }
-        .padding()
+        .padding(Spacing.md)
         .disabled(currentPlannedExercise == nil)
+        .opacity(currentPlannedExercise == nil ? Opacity.muted : 1)
     }
 
     private func logSet() {

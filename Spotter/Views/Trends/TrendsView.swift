@@ -31,6 +31,9 @@ struct TrendsView: View {
                     // Consistency Card
                     consistencyCard
 
+                    Divider()
+                        .foregroundStyle(Color.spotterBorder)
+
                     // Exercise Picker
                     if !exerciseOptions.isEmpty {
                         exercisePicker
@@ -44,8 +47,9 @@ struct TrendsView: View {
                     // Weekly Volume
                     weeklyVolumeCard
                 }
-                .padding()
+                .padding(Spacing.md)
             }
+            .background(Color.spotterBackground)
             .navigationTitle("Trends")
             .onAppear {
                 if selectedExercise == nil {
@@ -62,16 +66,17 @@ struct TrendsView: View {
 
         return VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("This Week")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             HStack(alignment: .bottom, spacing: Spacing.sm) {
                 Text("\(sessionsThisWeek.count)")
                     .font(.spotterLargeNumber)
+                    .foregroundStyle(Color.spotterText)
 
                 Text("sessions")
                     .font(.spotterBody)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
                     .padding(.bottom, 8)
             }
 
@@ -83,28 +88,23 @@ struct TrendsView: View {
                     let isToday = calendar.isDateInToday(date)
 
                     Circle()
-                        .fill(hasSession ? Color.spotterSuccessFallback : (isToday ? Color.spotterPrimaryFallback.opacity(0.3) : Color.spotterSurfaceFallback))
+                        .fill(hasSession ? Color.spotterSuccess : Color.clear)
                         .frame(width: 24, height: 24)
                         .overlay {
-                            if isToday {
-                                Circle()
-                                    .strokeBorder(Color.spotterPrimaryFallback, lineWidth: 2)
-                            }
+                            Circle()
+                                .strokeBorder(isToday ? Color.spotterPrimary : Color.spotterBorder, lineWidth: isToday ? BorderWidth.medium : BorderWidth.thin)
                         }
                 }
             }
         }
-        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var exercisePicker: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Track Progress")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Spacing.sm) {
@@ -117,9 +117,15 @@ struct TrendsView: View {
                                 .font(.spotterBody)
                                 .padding(.horizontal, Spacing.md)
                                 .padding(.vertical, Spacing.sm)
-                                .background(selectedExercise?.id == exercise.id ? Color.spotterPrimaryFallback : Color.spotterSurfaceFallback)
-                                .foregroundStyle(selectedExercise?.id == exercise.id ? .white : .primary)
-                                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                                .background(
+                                    RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                        .fill(selectedExercise?.id == exercise.id ? Color.spotterPrimary : Color.clear)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                        .strokeBorder(selectedExercise?.id == exercise.id ? Color.clear : Color.spotterBorder, lineWidth: BorderWidth.thin)
+                                )
+                                .foregroundStyle(selectedExercise?.id == exercise.id ? .white : Color.spotterText)
                         }
                     }
                 }
@@ -136,11 +142,12 @@ struct TrendsView: View {
         return VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Estimated 1RM")
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
 
             if dataPoints.isEmpty {
                 Text("No data yet for \(exercise.name)")
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
                     .frame(height: 200)
                     .frame(maxWidth: .infinity)
             } else {
@@ -150,13 +157,13 @@ struct TrendsView: View {
                             x: .value("Date", point.date),
                             y: .value("e1RM", point.e1rm)
                         )
-                        .foregroundStyle(Color.spotterPrimaryFallback)
+                        .foregroundStyle(Color.spotterPrimary)
 
                         PointMark(
                             x: .value("Date", point.date),
                             y: .value("e1RM", point.e1rm)
                         )
-                        .foregroundStyle(Color.spotterPrimaryFallback)
+                        .foregroundStyle(Color.spotterPrimary)
                     }
                 }
                 .frame(height: 200)
@@ -165,9 +172,11 @@ struct TrendsView: View {
                 }
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.md)
+                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+        )
     }
 
     private var weeklyVolumeCard: some View {
@@ -185,6 +194,7 @@ struct TrendsView: View {
         return VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Weekly Volume")
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
 
             Chart {
                 ForEach(Array(last4Weeks), id: \.weekStart) { data in
@@ -192,7 +202,7 @@ struct TrendsView: View {
                         x: .value("Week", data.weekStart, unit: .weekOfYear),
                         y: .value("Volume", data.volume)
                     )
-                    .foregroundStyle(Color.spotterPrimaryFallback)
+                    .foregroundStyle(Color.spotterPrimary)
                 }
             }
             .frame(height: 150)
@@ -202,9 +212,11 @@ struct TrendsView: View {
                 }
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.md)
+                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+        )
     }
 }
 

@@ -7,17 +7,18 @@ struct LastSessionCard: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             HStack {
                 Text("Last Session")
-                    .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .font(.spotterLabel)
+                    .foregroundStyle(Color.spotterTextSecondary)
                 Spacer()
                 Text(DateFormatters.formatRelativeDate(session.date))
                     .font(.spotterCaption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.spotterTextSecondary)
             }
 
             if let planDayName = session.planDayName {
                 Text(planDayName)
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
             }
 
             HStack(spacing: Spacing.lg) {
@@ -40,19 +41,18 @@ struct LastSessionCard: View {
                     )
                 }
             }
+            .padding(.top, Spacing.xs)
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func statItem(value: String, label: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(value)
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
             Text(label)
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
         }
     }
 }

@@ -22,25 +22,27 @@ struct SettingsView: View {
                 Section("Training Plan") {
                     if let plan = activePlan {
                         HStack {
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: Spacing.xs) {
                                 Text(plan.name)
                                     .font(.spotterBody)
+                                    .foregroundStyle(Color.spotterText)
                                 Text("\(plan.daysPerWeek) days/week")
                                     .font(.spotterCaption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.spotterTextSecondary)
                             }
                             Spacer()
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(Color.spotterSuccessFallback)
+                            Image(systemName: "checkmark.circle")
+                                .foregroundStyle(Color.spotterSuccess)
                         }
                     } else {
                         Text("No active plan")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.spotterTextSecondary)
                     }
 
                     Button("Create New Plan") {
                         showingPlanSetup = true
                     }
+                    .foregroundStyle(Color.spotterPrimary)
                 }
 
                 // Exercise Library Section
@@ -50,14 +52,14 @@ struct SettingsView: View {
                     } label: {
                         HStack {
                             Text("Exercise Library")
+                                .foregroundStyle(Color.spotterText)
                             Spacer()
                             Text("\(exercises.count)")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.spotterTextSecondary)
                             Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.spotterTextSecondary)
                         }
                     }
-                    .foregroundStyle(.primary)
                 }
 
                 // Preferences Section
@@ -72,12 +74,15 @@ struct SettingsView: View {
                 Section("About") {
                     HStack {
                         Text("Version")
+                            .foregroundStyle(Color.spotterText)
                         Spacer()
                         Text("1.0.0")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.spotterTextSecondary)
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.spotterBackground)
             .navigationTitle("Settings")
             .fullScreenCover(isPresented: $showingPlanSetup) {
                 PlanSetupView()

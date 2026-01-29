@@ -18,6 +18,9 @@ struct SessionDetailView: View {
                     // Session Header
                     sessionHeader
 
+                    Divider()
+                        .foregroundStyle(Color.spotterBorder)
+
                     // Exercises
                     ForEach(exerciseGroups, id: \.0) { exerciseName, sets in
                         exerciseSection(name: exerciseName, sets: sets)
@@ -33,8 +36,9 @@ struct SessionDetailView: View {
                         notesSection(notes)
                     }
                 }
-                .padding()
+                .padding(Spacing.md)
             }
+            .background(Color.spotterBackground)
             .navigationTitle(DateFormatters.formatRelativeDate(session.date))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -42,6 +46,7 @@ struct SessionDetailView: View {
                     Button("Done") {
                         dismiss()
                     }
+                    .foregroundStyle(Color.spotterPrimary)
                 }
             }
         }
@@ -52,6 +57,7 @@ struct SessionDetailView: View {
             if let planDayName = session.planDayName {
                 Text(planDayName)
                     .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterText)
             }
 
             HStack(spacing: Spacing.lg) {
@@ -66,31 +72,38 @@ struct SessionDetailView: View {
                 }
             }
             .font(.spotterCaption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.spotterTextSecondary)
         }
-        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func exerciseSection(name: String, sets: [SetEntry]) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text(name)
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
 
-            ForEach(Array(sets.enumerated()), id: \.element.id) { index, set in
-                HStack {
-                    Text("Set \(index + 1)")
-                        .font(.spotterBody)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text("\(set.displayWeight) × \(set.reps)")
-                        .font(.spotterBody)
-                    if let rpe = set.rpe {
-                        Text("@\(rpe)")
-                            .font(.spotterCaption)
-                            .foregroundStyle(.secondary)
+            VStack(spacing: 0) {
+                ForEach(Array(sets.enumerated()), id: \.element.id) { index, set in
+                    HStack {
+                        Text("Set \(index + 1)")
+                            .font(.spotterBody)
+                            .foregroundStyle(Color.spotterTextSecondary)
+                        Spacer()
+                        Text("\(set.displayWeight) × \(set.reps)")
+                            .font(.spotterBody)
+                            .foregroundStyle(Color.spotterText)
+                        if let rpe = set.rpe {
+                            Text("@\(rpe)")
+                                .font(.spotterCaption)
+                                .foregroundStyle(Color.spotterTextSecondary)
+                        }
+                    }
+                    .padding(.vertical, Spacing.sm)
+
+                    if index < sets.count - 1 {
+                        Divider()
+                            .foregroundStyle(Color.spotterBorder)
                     }
                 }
             }
@@ -100,56 +113,56 @@ struct SessionDetailView: View {
                 HStack {
                     Text("Best e1RM")
                         .font(.spotterCaption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.spotterTextSecondary)
                     Spacer()
                     Text(String(format: "%.0f lbs", OneRepMaxCalculator.estimate(from: bestSet)))
                         .font(.spotterCaption)
-                        .foregroundStyle(Color.spotterPrimaryFallback)
+                        .foregroundStyle(Color.spotterPrimary)
                 }
-                .padding(.top, Spacing.xs)
+                .padding(.top, Spacing.sm)
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: CornerRadius.md)
+                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+        )
     }
 
     private var painTagsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Discomfort Noted")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             HStack {
                 ForEach(session.painTags, id: \.self) { tag in
                     Text(tag)
                         .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterWarning)
                         .padding(.horizontal, Spacing.sm)
                         .padding(.vertical, Spacing.xs)
-                        .background(Color.spotterWarningFallback.opacity(0.2))
-                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                .strokeBorder(Color.spotterWarning.opacity(0.5), lineWidth: BorderWidth.thin)
+                        )
                 }
             }
         }
-        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func notesSection(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Notes")
-                .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             Text(notes)
                 .font(.spotterBody)
+                .foregroundStyle(Color.spotterText)
         }
-        .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func rpeEmoji(_ rpe: Int) -> String {

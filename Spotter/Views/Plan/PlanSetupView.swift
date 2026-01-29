@@ -43,6 +43,7 @@ struct PlanSetupView: View {
                         addDay()
                     } label: {
                         Label("Add Day", systemImage: "plus")
+                            .foregroundStyle(Color.spotterPrimary)
                     }
                 }
 
@@ -52,6 +53,8 @@ struct PlanSetupView: View {
                         .lineLimit(3...6)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.spotterBackground)
             .navigationTitle("Create Plan")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -59,12 +62,14 @@ struct PlanSetupView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundStyle(Color.spotterPrimary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         savePlan()
                     }
                     .disabled(planName.isEmpty || days.isEmpty)
+                    .foregroundStyle(planName.isEmpty || days.isEmpty ? Color.spotterTextSecondary : Color.spotterPrimary)
                 }
             }
             .onAppear {
@@ -87,16 +92,19 @@ struct PlanSetupView: View {
             } label: {
                 Label("Add Exercise", systemImage: "plus")
                     .font(.spotterCaption)
+                    .foregroundStyle(Color.spotterPrimary)
             }
         } label: {
             TextField("Day Name", text: day.name)
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
         }
     }
 
     private func exerciseRow(exercise: Binding<ExerciseEntry>) -> some View {
         VStack(spacing: Spacing.sm) {
             TextField("Exercise Name", text: exercise.name)
+                .foregroundStyle(Color.spotterText)
 
             HStack {
                 Stepper("Sets: \(exercise.wrappedValue.sets)", value: exercise.sets, in: 1...10)
@@ -105,7 +113,11 @@ struct PlanSetupView: View {
 
                 TextField("Reps", text: exercise.reps)
                     .frame(width: 60)
-                    .textFieldStyle(.roundedBorder)
+                    .padding(Spacing.sm)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CornerRadius.sm)
+                            .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                    )
             }
         }
         .padding(.vertical, Spacing.xs)

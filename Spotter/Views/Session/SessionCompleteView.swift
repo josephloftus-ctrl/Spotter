@@ -24,6 +24,9 @@ struct SessionCompleteView: View {
                     // Session Summary
                     sessionSummary
 
+                    Divider()
+                        .foregroundStyle(Color.spotterBorder)
+
                     // Feel Rating
                     feelRating
 
@@ -33,8 +36,9 @@ struct SessionCompleteView: View {
                     // Notes
                     notesSection
                 }
-                .padding()
+                .padding(Spacing.md)
             }
+            .background(Color.spotterBackground)
             .navigationTitle("Session Complete")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -42,7 +46,8 @@ struct SessionCompleteView: View {
                     Button("Save") {
                         saveSession()
                     }
-                    .font(.headline)
+                    .font(.spotterHeadline)
+                    .foregroundStyle(Color.spotterPrimary)
                 }
             }
         }
@@ -50,13 +55,14 @@ struct SessionCompleteView: View {
 
     private var sessionSummary: some View {
         VStack(spacing: Spacing.md) {
-            Image(systemName: "checkmark.circle.fill")
+            Image(systemName: "checkmark.circle")
                 .font(.system(size: 64))
-                .foregroundStyle(Color.spotterSuccessFallback)
+                .foregroundStyle(Color.spotterSuccess)
 
             if let duration = session.duration {
                 Text(DateFormatters.formatDuration(duration))
                     .font(.spotterTitle)
+                    .foregroundStyle(Color.spotterText)
             }
 
             HStack(spacing: Spacing.lg) {
@@ -65,18 +71,17 @@ struct SessionCompleteView: View {
                 statItem(value: formatVolume(session.totalVolume), label: "volume")
             }
         }
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+        .padding(Spacing.lg)
     }
 
     private func statItem(value: String, label: String) -> some View {
-        VStack {
+        VStack(spacing: Spacing.xs) {
             Text(value)
                 .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
             Text(label)
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
         }
     }
 
@@ -90,7 +95,8 @@ struct SessionCompleteView: View {
     private var feelRating: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("How did it feel?")
-                .font(.spotterHeadline)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterText)
 
             HStack(spacing: Spacing.md) {
                 ForEach(1...5, id: \.self) { rating in
@@ -101,26 +107,30 @@ struct SessionCompleteView: View {
                         Text(rpeEmojis[rating - 1])
                             .font(.system(size: 32))
                             .padding(Spacing.sm)
-                            .background(sessionRPE == rating ? Color.spotterPrimaryFallback.opacity(0.2) : Color.clear)
-                            .clipShape(Circle())
+                            .background(
+                                Circle()
+                                    .fill(sessionRPE == rating ? Color.spotterPrimary.opacity(Opacity.subtle) : Color.clear)
+                            )
+                            .overlay(
+                                Circle()
+                                    .strokeBorder(sessionRPE == rating ? Color.spotterPrimary : Color.clear, lineWidth: BorderWidth.medium)
+                            )
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var painTagSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Any discomfort?")
-                .font(.spotterHeadline)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterText)
 
             Text("Optional — helps track patterns")
                 .font(.spotterCaption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.spotterTextSecondary)
 
             FlowLayout(spacing: Spacing.sm) {
                 ForEach(painTagOptions, id: \.self) { tag in
@@ -132,32 +142,39 @@ struct SessionCompleteView: View {
                             .font(.spotterBody)
                             .padding(.horizontal, Spacing.md)
                             .padding(.vertical, Spacing.sm)
-                            .background(selectedPainTags.contains(tag) ? Color.spotterWarningFallback : Color.spotterSurfaceFallback)
-                            .foregroundStyle(selectedPainTags.contains(tag) ? .white : .primary)
-                            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                            .background(
+                                RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                    .fill(selectedPainTags.contains(tag) ? Color.spotterWarning : Color.clear)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                    .strokeBorder(selectedPainTags.contains(tag) ? Color.spotterWarning : Color.spotterBorder, lineWidth: BorderWidth.thin)
+                            )
+                            .foregroundStyle(selectedPainTags.contains(tag) ? .white : Color.spotterText)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             Text("Notes")
-                .font(.spotterHeadline)
+                .font(.spotterLabel)
+                .foregroundStyle(Color.spotterText)
 
             TextField("Optional notes...", text: $notes, axis: .vertical)
-                .textFieldStyle(.roundedBorder)
+                .font(.spotterBody)
+                .padding(Spacing.sm)
+                .background(Color.spotterBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: CornerRadius.sm)
+                        .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                )
                 .lineLimit(3...6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.spotterSurfaceFallback)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private func togglePainTag(_ tag: String) {
