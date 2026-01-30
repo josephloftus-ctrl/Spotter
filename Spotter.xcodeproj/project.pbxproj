@@ -36,6 +36,7 @@
 		A1000027 /* ExerciseSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027; };
 		A1000028 /* DefaultExercises.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000028; };
 		A1000029 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000029; };
+		A1000030 /* SpotterComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +69,7 @@
 		A2000027 /* ExerciseSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSeeder.swift; sourceTree = "<group>"; };
 		A2000028 /* DefaultExercises.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DefaultExercises.json; sourceTree = "<group>"; };
 		A2000029 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A2000030 /* SpotterComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotterComponents.swift; sourceTree = "<group>"; };
 		A3000001 /* Spotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -193,6 +195,7 @@
 				A2000012 /* HapticManager.swift */,
 				A2000013 /* DateFormatters.swift */,
 				A2000014 /* OneRepMaxCalculator.swift */,
+				A2000030 /* SpotterComponents.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				A1000025 /* PlanSetupView.swift in Sources */,
 				A1000026 /* ExerciseLibraryView.swift in Sources */,
 				A1000027 /* ExerciseSeeder.swift in Sources */,
+				A1000030 /* SpotterComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
