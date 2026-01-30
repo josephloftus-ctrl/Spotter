@@ -56,12 +56,19 @@ struct TodayView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
+                    // Logo header - sits naturally below dynamic island
+                    Text("SPOTTER")
+                        .font(.system(size: 13, weight: .bold, design: .default))
+                        .tracking(3)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, Spacing.sm)
+
                     // Hero Header
                     heroHeader
-                        .padding(.top, Spacing.md)
 
                     // Week Progress with Glass Container
                     GlassEffectContainer(spacing: Spacing.md) {
@@ -81,31 +88,22 @@ struct TodayView: View {
                     Spacer(minLength: Spacing.xl)
                 }
                 .padding(.horizontal, Spacing.md)
-                .padding(.bottom, 120) // Space for button
+                .padding(.bottom, 200) // Space for buttons + tab bar
             }
-            .background(Color.spotterBackground)
-            .safeAreaInset(edge: .bottom) {
-                actionButtons
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("SPOTTER")
-                        .font(.system(size: 13, weight: .bold, design: .default))
-                        .tracking(3)
-                        .foregroundStyle(Color.spotterTextMuted)
-                }
-            }
-            .fullScreenCover(isPresented: $showingActiveSession) {
-                ActiveSessionView(planDay: nextPlanDay)
-            }
-            .fullScreenCover(isPresented: $showingQuickSession) {
-                ActiveSessionView(planDay: nil)
-            }
-            .fullScreenCover(isPresented: $showingClimbingSession) {
-                if let gym = defaultGym {
-                    ActiveClimbingSessionView(gym: gym)
-                }
+
+            // Action buttons above tab bar
+            actionButtons
+        }
+        .background(Color.spotterBackground)
+        .fullScreenCover(isPresented: $showingActiveSession) {
+            ActiveSessionView(planDay: nextPlanDay)
+        }
+        .fullScreenCover(isPresented: $showingQuickSession) {
+            ActiveSessionView(planDay: nil)
+        }
+        .fullScreenCover(isPresented: $showingClimbingSession) {
+            if let gym = defaultGym {
+                ActiveClimbingSessionView(gym: gym)
             }
         }
     }
@@ -218,38 +216,41 @@ struct TodayView: View {
     }
 
     private var actionButtons: some View {
-        GlassEffectContainer(spacing: Spacing.sm) {
-            VStack(spacing: Spacing.sm) {
-                // Primary lifting actions
-                if nextPlanDay != nil {
-                    SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
-                        showingActiveSession = true
-                    }
-                } else {
-                    SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
-                        showingQuickSession = true
-                    }
-                }
-
-                // Climbing session
-                if defaultGym != nil {
-                    SpotterButton("Start Climbing", icon: "mountain.2.fill", style: .secondary) {
-                        showingClimbingSession = true
-                    }
-                }
-            }
-        }
-        .padding(Spacing.md)
-        .background(
+        VStack(spacing: 0) {
+            // Fade gradient
             LinearGradient(
                 colors: [Color.spotterBackground.opacity(0), Color.spotterBackground],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .frame(height: 40)
-            .offset(y: -40),
-            alignment: .top
-        )
+
+            // Buttons
+            GlassEffectContainer(spacing: Spacing.sm) {
+                VStack(spacing: Spacing.sm) {
+                    // Primary lifting actions
+                    if nextPlanDay != nil {
+                        SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
+                            showingActiveSession = true
+                        }
+                    } else {
+                        SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
+                            showingQuickSession = true
+                        }
+                    }
+
+                    // Climbing session
+                    if defaultGym != nil {
+                        SpotterButton("Start Climbing", icon: "mountain.2.fill", style: .secondary) {
+                            showingClimbingSession = true
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, Spacing.md)
+            .padding(.bottom, 100) // Space for tab bar
+            .background(Color.spotterBackground)
+        }
     }
 }
 
