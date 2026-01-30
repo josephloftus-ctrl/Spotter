@@ -27,7 +27,7 @@ jobs:
         xcodebuild clean build \
           -project Spotter.xcodeproj \
           -scheme Spotter \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.0' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' \
           -configuration Debug \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
