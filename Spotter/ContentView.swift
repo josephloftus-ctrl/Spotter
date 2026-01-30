@@ -3,6 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @State private var selectedTab = 0
+    @Namespace private var tabNamespace
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -22,35 +23,29 @@ struct ContentView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
 
-            // Custom tab bar
-            customTabBar
+            // Liquid Glass tab bar
+            glassTabBar
         }
         .ignoresSafeArea(.keyboard)
     }
 
-    private var customTabBar: some View {
-        HStack(spacing: 0) {
-            tabBarItem(icon: "flame.fill", label: "Today", index: 0)
-            tabBarItem(icon: "clock.fill", label: "History", index: 1)
-            tabBarItem(icon: "chart.line.uptrend.xyaxis", label: "Trends", index: 2)
-            tabBarItem(icon: "gearshape.fill", label: "Settings", index: 3)
+    private var glassTabBar: some View {
+        GlassEffectContainer(spacing: 0) {
+            HStack(spacing: 0) {
+                glassTabItem(icon: "flame.fill", label: "Today", index: 0)
+                glassTabItem(icon: "clock.fill", label: "History", index: 1)
+                glassTabItem(icon: "chart.line.uptrend.xyaxis", label: "Trends", index: 2)
+                glassTabItem(icon: "gearshape.fill", label: "Settings", index: 3)
+            }
+            .padding(.horizontal, Spacing.sm)
+            .padding(.vertical, Spacing.xs)
+            .glassEffect(.regular, in: Capsule())
         }
         .padding(.horizontal, Spacing.md)
-        .padding(.top, Spacing.sm)
         .padding(.bottom, Spacing.xs)
-        .background(
-            Rectangle()
-                .fill(Color.spotterSurface)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(Color.spotterBorder)
-                        .frame(height: 1)
-                }
-                .ignoresSafeArea(edges: .bottom)
-        )
     }
 
-    private func tabBarItem(icon: String, label: String, index: Int) -> some View {
+    private func glassTabItem(icon: String, label: String, index: Int) -> some View {
         let isSelected = selectedTab == index
 
         return Button {
@@ -60,25 +55,21 @@ struct ContentView: View {
             HapticManager.selection()
         } label: {
             VStack(spacing: Spacing.xxs) {
-                ZStack {
-                    if isSelected {
-                        Capsule()
-                            .fill(Color.spotterPrimaryMuted)
-                            .frame(width: 56, height: 32)
-                    }
-
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
-                        .foregroundStyle(isSelected ? Color.spotterPrimary : Color.spotterTextMuted)
-                }
+                Image(systemName: icon)
+                    .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+                    .frame(width: 44, height: 28)
+                    .glassEffect(
+                        isSelected ? .regular.tint(.spotterPrimary).interactive() : .identity,
+                        in: Capsule()
+                    )
 
                 Text(label)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .medium))
-                    .foregroundStyle(isSelected ? Color.spotterPrimary : Color.spotterTextMuted)
             }
+            .foregroundStyle(isSelected ? Color.spotterPrimary : Color.spotterTextMuted)
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }
 

@@ -87,16 +87,7 @@ struct PlanSetupView: View {
                         .font(.spotterCaptionMedium)
                         .foregroundStyle(Color.spotterTextSecondary)
 
-                    TextField("e.g., Upper/Lower Split", text: $planName)
-                        .font(.spotterBody)
-                        .foregroundStyle(Color.spotterText)
-                        .padding(Spacing.sm)
-                        .background(Color.spotterSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: CornerRadius.sm)
-                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-                        )
+                    GlassTextField(placeholder: "e.g., Upper/Lower Split", text: $planName)
                 }
 
                 VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -104,27 +95,19 @@ struct PlanSetupView: View {
                         .font(.spotterCaptionMedium)
                         .foregroundStyle(Color.spotterTextSecondary)
 
-                    HStack(spacing: Spacing.sm) {
-                        ForEach(1...7, id: \.self) { num in
-                            Button {
-                                daysPerWeek = num
-                                HapticManager.selection()
-                            } label: {
-                                Text("\(num)")
-                                    .font(.spotterBodyMedium)
-                                    .foregroundStyle(daysPerWeek == num ? .white : Color.spotterTextSecondary)
-                                    .frame(width: 40, height: 40)
-                                    .background(
-                                        Circle()
-                                            .fill(daysPerWeek == num ? Color.spotterPrimary : Color.spotterSurface)
-                                    )
-                                    .overlay(
-                                        Circle()
-                                            .strokeBorder(
-                                                daysPerWeek == num ? Color.clear : Color.spotterBorder,
-                                                lineWidth: BorderWidth.thin
-                                            )
-                                    )
+                    GlassEffectContainer(spacing: Spacing.sm) {
+                        HStack(spacing: Spacing.sm) {
+                            ForEach(1...7, id: \.self) { num in
+                                Button {
+                                    daysPerWeek = num
+                                    HapticManager.selection()
+                                } label: {
+                                    Text("\(num)")
+                                        .font(.spotterBodyMedium)
+                                        .foregroundStyle(daysPerWeek == num ? .white : Color.spotterTextSecondary)
+                                        .frame(width: 40, height: 40)
+                                }
+                                .buttonStyle(.glass(daysPerWeek == num ? .regular.tint(.spotterPrimary).interactive() : .clear.interactive()))
                             }
                         }
                     }
@@ -164,9 +147,8 @@ struct PlanSetupView: View {
             VStack(alignment: .leading, spacing: Spacing.md) {
                 // Day header
                 HStack {
-                    TextField("Day Name", text: day.name)
+                    GlassTextField(placeholder: "Day Name", text: day.name)
                         .font(.spotterHeadline)
-                        .foregroundStyle(Color.spotterText)
 
                     Spacer()
 
@@ -319,16 +301,7 @@ struct PlanSetupView: View {
             VStack(alignment: .leading, spacing: Spacing.md) {
                 SectionHeader("Notes", subtitle: "Optional")
 
-                TextField("Any notes about this plan...", text: $notes, axis: .vertical)
-                    .font(.spotterBody)
-                    .foregroundStyle(Color.spotterText)
-                    .padding(Spacing.sm)
-                    .background(Color.spotterSurface)
-                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.sm)
-                            .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-                    )
+                GlassTextField(placeholder: "Any notes about this plan...", text: $notes, axis: .vertical)
                     .lineLimit(3...6)
             }
         }

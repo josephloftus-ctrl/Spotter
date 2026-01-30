@@ -175,50 +175,51 @@ struct ActiveSessionView: View {
     }
 
     private var sessionHeader: some View {
-        HStack(spacing: Spacing.lg) {
-            // Timer
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                Text("Duration")
-                    .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterTextMuted)
-                    .textCase(.uppercase)
-                    .tracking(0.5)
+        GlassEffectContainer(spacing: Spacing.lg) {
+            HStack(spacing: Spacing.lg) {
+                // Timer
+                VStack(alignment: .leading, spacing: Spacing.xxs) {
+                    Text("Duration")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
 
-                Text(formatElapsedTime())
-                    .font(.spotterTimer)
-                    .foregroundStyle(Color.spotterText)
-                    .monospacedDigit()
+                    Text(formatElapsedTime())
+                        .font(.spotterTimer)
+                        .foregroundStyle(Color.spotterText)
+                        .monospacedDigit()
+                }
+
+                Spacer()
+
+                // Sets counter
+                VStack(alignment: .trailing, spacing: Spacing.xxs) {
+                    Text("Sets")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+
+                    Text("\(session.sets.count)")
+                        .font(.spotterMediumNumber)
+                        .foregroundStyle(Color.spotterText)
+                        .contentTransition(.numericText())
+                        .animation(SpotterAnimation.bounce, value: session.sets.count)
+                }
+
+                // Progress ring (for planned sessions)
+                if !isQuickSession {
+                    ProgressRing(
+                        progress: sessionProgress,
+                        lineWidth: 5,
+                        size: 44
+                    )
+                }
             }
-
-            Spacer()
-
-            // Sets counter
-            VStack(alignment: .trailing, spacing: Spacing.xxs) {
-                Text("Sets")
-                    .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterTextMuted)
-                    .textCase(.uppercase)
-                    .tracking(0.5)
-
-                Text("\(session.sets.count)")
-                    .font(.spotterMediumNumber)
-                    .foregroundStyle(Color.spotterText)
-                    .contentTransition(.numericText())
-                    .animation(SpotterAnimation.bounce, value: session.sets.count)
-            }
-
-            // Progress ring (for planned sessions)
-            if !isQuickSession {
-                ProgressRing(
-                    progress: sessionProgress,
-                    lineWidth: 5,
-                    size: 44
-                )
-            }
+            .padding(Spacing.md)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: CornerRadius.md))
         }
-        .padding(Spacing.md)
-        .background(Color.spotterSurfaceElevated)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
     private var currentExerciseSection: some View {
@@ -334,11 +335,10 @@ struct ActiveSessionView: View {
                             if let rpe = set.rpe {
                                 Text("@\(rpe)")
                                     .font(.spotterCaption)
-                                    .foregroundStyle(rpeColor(for: rpe))
+                                    .foregroundStyle(.white)
                                     .padding(.horizontal, Spacing.xs)
                                     .padding(.vertical, 2)
-                                    .background(rpeColor(for: rpe).opacity(0.15))
-                                    .clipShape(Capsule())
+                                    .glassEffect(.regular.tint(rpeColor(for: rpe)), in: Capsule())
                             }
                         }
                         .padding(.horizontal, Spacing.md)
@@ -418,15 +418,11 @@ struct ActiveSessionView: View {
 
     private var allCompleteView: some View {
         VStack(spacing: Spacing.lg) {
-            ZStack {
-                Circle()
-                    .fill(Color.spotterSuccess.opacity(0.15))
-                    .frame(width: 100, height: 100)
-
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(Color.spotterSuccess)
-            }
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 64))
+                .foregroundStyle(Color.spotterSuccess)
+                .padding(Spacing.lg)
+                .glassEffect(.regular.tint(.spotterSuccess.opacity(0.3)), in: Circle())
 
             VStack(spacing: Spacing.xs) {
                 Text("Workout Complete!")

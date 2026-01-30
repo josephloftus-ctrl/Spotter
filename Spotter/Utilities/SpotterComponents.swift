@@ -1,22 +1,20 @@
 import SwiftUI
 
-// MARK: - Primary Button
+// MARK: - Primary Button (Liquid Glass)
 
 struct SpotterButton: View {
     let title: String
     let icon: String?
-    let style: ButtonStyle
+    let style: SpotterButtonStyle
     let action: () -> Void
 
-    @State private var isPressed = false
-
-    enum ButtonStyle {
-        case primary    // Gradient fill, main CTAs
-        case secondary  // Bordered, secondary actions
+    enum SpotterButtonStyle {
+        case primary    // Glass with tint, main CTAs
+        case secondary  // Clear glass, secondary actions
         case ghost      // Text only, tertiary
     }
 
-    init(_ title: String, icon: String? = nil, style: ButtonStyle = .primary, action: @escaping () -> Void) {
+    init(_ title: String, icon: String? = nil, style: SpotterButtonStyle = .primary, action: @escaping () -> Void) {
         self.title = title
         self.icon = icon
         self.style = style
@@ -24,103 +22,98 @@ struct SpotterButton: View {
     }
 
     var body: some View {
+        switch style {
+        case .primary:
+            primaryButton
+        case .secondary:
+            secondaryButton
+        case .ghost:
+            ghostButton
+        }
+    }
+
+    private var buttonLabel: some View {
+        HStack(spacing: Spacing.sm) {
+            if let icon = icon {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+            }
+            Text(title)
+                .font(.spotterLabel)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Spacing.md)
+        .padding(.horizontal, Spacing.lg)
+    }
+
+    private var primaryButton: some View {
         Button {
             HapticManager.buttonTap()
             action()
         } label: {
-            HStack(spacing: Spacing.sm) {
-                if let icon = icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 18, weight: .semibold))
-                }
-                Text(title)
-                    .font(.spotterLabel)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Spacing.md)
-            .padding(.horizontal, Spacing.lg)
-            .background(backgroundView)
-            .foregroundStyle(foregroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
-            .overlay(overlayView)
-            .scaleEffect(isPressed ? 0.97 : 1.0)
+            buttonLabel
         }
-        .buttonStyle(PlainButtonStyle())
-        .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
-        .animation(SpotterAnimation.quick, value: isPressed)
+        .buttonStyle(.glass(.regular.tint(.spotterPrimary).interactive()))
     }
 
-    @ViewBuilder
-    private var backgroundView: some View {
-        switch style {
-        case .primary:
-            LinearGradient.spotterPrimaryGradient
-        case .secondary:
-            Color.clear
-        case .ghost:
-            Color.clear
+    private var secondaryButton: some View {
+        Button {
+            HapticManager.buttonTap()
+            action()
+        } label: {
+            buttonLabel
         }
+        .buttonStyle(.glass(.clear.interactive()))
     }
 
-    private var foregroundColor: Color {
-        switch style {
-        case .primary:
-            return .white
-        case .secondary, .ghost:
-            return .spotterPrimary
+    private var ghostButton: some View {
+        Button {
+            HapticManager.buttonTap()
+            action()
+        } label: {
+            buttonLabel
+                .foregroundStyle(Color.spotterPrimary)
         }
-    }
-
-    @ViewBuilder
-    private var overlayView: some View {
-        switch style {
-        case .primary:
-            EmptyView()
-        case .secondary:
-            RoundedRectangle(cornerRadius: CornerRadius.md)
-                .strokeBorder(Color.spotterPrimary, lineWidth: BorderWidth.medium)
-        case .ghost:
-            EmptyView()
-        }
+        .buttonStyle(.plain)
     }
 }
 
-// MARK: - Card Container
+// MARK: - Card Container (Liquid Glass)
 
 struct SpotterCard<Content: View>: View {
     let content: Content
     var accentEdge: Edge?
     var padding: CGFloat
+    var tintColor: Color?
 
     init(
         accentEdge: Edge? = nil,
         padding: CGFloat = Spacing.lg,
+        tint: Color? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.accentEdge = accentEdge
         self.padding = padding
+        self.tintColor = tint
         self.content = content()
     }
 
     var body: some View {
         content
             .padding(padding)
-            .background(
-                ZStack {
-                    Color.spotterSurfaceElevated
-                    LinearGradient.spotterCardHighlight
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
-            .overlay(
-                RoundedRectangle(cornerRadius: CornerRadius.md)
-                    .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-            )
+            .glassEffect(glassStyle, in: RoundedRectangle(cornerRadius: CornerRadius.md))
             .overlay(alignment: accentAlignment) {
                 if accentEdge != nil {
                     accentBar
                 }
             }
+    }
+
+    private var glassStyle: Glass {
+        if let tint = tintColor {
+            return .regular.tint(tint)
+        }
+        return .regular
     }
 
     private var accentAlignment: Alignment {
@@ -152,14 +145,30 @@ struct SpotterCard<Content: View>: View {
     }
 }
 
-// MARK: - Chip / Pill Selector
+// MARK: - Glass Effect Container Wrapper
+
+struct SpotterGlassContainer<Content: View>: View {
+    let spacing: CGFloat
+    let content: Content
+
+    init(spacing: CGFloat = Spacing.md, @ViewBuilder content: () -> Content) {
+        self.spacing = spacing
+        self.content = content()
+    }
+
+    var body: some View {
+        GlassEffectContainer(spacing: spacing) {
+            content
+        }
+    }
+}
+
+// MARK: - Chip / Pill Selector (Liquid Glass)
 
 struct SpotterChip: View {
     let label: String
     let isSelected: Bool
     let action: () -> Void
-
-    @State private var isPressed = false
 
     var body: some View {
         Button {
@@ -170,29 +179,9 @@ struct SpotterChip: View {
                 .font(.spotterCaptionMedium)
                 .padding(.horizontal, Spacing.md)
                 .padding(.vertical, Spacing.xs)
-                .background(
-                    Group {
-                        if isSelected {
-                            LinearGradient.spotterPrimaryGradient
-                        } else {
-                            Color.spotterSurface
-                        }
-                    }
-                )
                 .foregroundStyle(isSelected ? .white : Color.spotterTextSecondary)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule()
-                        .strokeBorder(
-                            isSelected ? Color.clear : Color.spotterBorder,
-                            lineWidth: BorderWidth.thin
-                        )
-                )
-                .scaleEffect(isPressed ? 0.95 : 1.0)
         }
-        .buttonStyle(PlainButtonStyle())
-        .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
-        .animation(SpotterAnimation.quick, value: isPressed)
+        .buttonStyle(.glass(isSelected ? .regular.tint(.spotterPrimary).interactive() : .clear.interactive()))
         .animation(SpotterAnimation.quick, value: isSelected)
     }
 }
@@ -286,7 +275,7 @@ struct SectionHeader: View {
     }
 }
 
-// MARK: - Stepper Button
+// MARK: - Stepper Button (Liquid Glass)
 
 struct SpotterStepper: View {
     @Binding var value: Double
@@ -296,40 +285,42 @@ struct SpotterStepper: View {
     let unit: String
 
     var body: some View {
-        HStack(spacing: Spacing.md) {
-            // Decrement
-            StepperButton(icon: "minus") {
-                if value - step >= range.lowerBound {
-                    value -= step
-                    HapticManager.selection()
+        GlassEffectContainer(spacing: Spacing.md) {
+            HStack(spacing: Spacing.md) {
+                // Decrement
+                StepperButton(icon: "minus") {
+                    if value - step >= range.lowerBound {
+                        value -= step
+                        HapticManager.selection()
+                    }
                 }
-            }
-            .disabled(value <= range.lowerBound)
+                .disabled(value <= range.lowerBound)
 
-            // Value display
-            VStack(spacing: Spacing.xxs) {
-                Text("\(Int(value))")
-                    .font(.spotterLargeNumber)
-                    .foregroundStyle(Color.spotterText)
-                    .contentTransition(.numericText())
-                    .animation(SpotterAnimation.quick, value: value)
+                // Value display
+                VStack(spacing: Spacing.xxs) {
+                    Text("\(Int(value))")
+                        .font(.spotterLargeNumber)
+                        .foregroundStyle(Color.spotterText)
+                        .contentTransition(.numericText())
+                        .animation(SpotterAnimation.quick, value: value)
 
-                Text(unit)
-                    .font(.spotterCaptionMedium)
-                    .foregroundStyle(Color.spotterTextMuted)
-                    .textCase(.uppercase)
-                    .tracking(0.5)
-            }
-            .frame(minWidth: 100)
-
-            // Increment
-            StepperButton(icon: "plus") {
-                if value + step <= range.upperBound {
-                    value += step
-                    HapticManager.selection()
+                    Text(unit)
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
                 }
+                .frame(minWidth: 100)
+
+                // Increment
+                StepperButton(icon: "plus") {
+                    if value + step <= range.upperBound {
+                        value += step
+                        HapticManager.selection()
+                    }
+                }
+                .disabled(value >= range.upperBound)
             }
-            .disabled(value >= range.upperBound)
         }
     }
 }
@@ -338,7 +329,6 @@ struct StepperButton: View {
     let icon: String
     let action: () -> Void
 
-    @State private var isPressed = false
     @Environment(\.isEnabled) private var isEnabled
 
     var body: some View {
@@ -349,24 +339,13 @@ struct StepperButton: View {
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(isEnabled ? Color.spotterPrimary : Color.spotterTextMuted)
                 .frame(width: 52, height: 52)
-                .background(Color.spotterSurface)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .strokeBorder(
-                            isEnabled ? Color.spotterPrimary.opacity(0.3) : Color.spotterBorder,
-                            lineWidth: BorderWidth.thin
-                        )
-                )
-                .scaleEffect(isPressed ? 0.95 : 1.0)
         }
-        .buttonStyle(PlainButtonStyle())
-        .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
-        .animation(SpotterAnimation.bounce, value: isPressed)
+        .buttonStyle(.glass(isEnabled ? .regular.tint(.spotterPrimary.opacity(0.3)).interactive() : .clear))
+        .disabled(!isEnabled)
     }
 }
 
-// MARK: - RPE Selector
+// MARK: - RPE Selector (Liquid Glass)
 
 struct RPESelector: View {
     @Binding var selectedRPE: Int?
@@ -379,15 +358,17 @@ struct RPESelector: View {
                 .font(.spotterCaption)
                 .foregroundStyle(Color.spotterTextSecondary)
 
-            HStack(spacing: Spacing.xs) {
-                ForEach(rpeValues, id: \.self) { rpe in
-                    RPEButton(
-                        value: rpe,
-                        isSelected: selectedRPE == rpe,
-                        color: rpeColor(for: rpe)
-                    ) {
-                        selectedRPE = selectedRPE == rpe ? nil : rpe
-                        HapticManager.selection()
+            GlassEffectContainer(spacing: Spacing.xs) {
+                HStack(spacing: Spacing.xs) {
+                    ForEach(rpeValues, id: \.self) { rpe in
+                        RPEButton(
+                            value: rpe,
+                            isSelected: selectedRPE == rpe,
+                            color: rpeColor(for: rpe)
+                        ) {
+                            selectedRPE = selectedRPE == rpe ? nil : rpe
+                            HapticManager.selection()
+                        }
                     }
                 }
             }
@@ -412,8 +393,6 @@ struct RPEButton: View {
     let color: Color
     let action: () -> Void
 
-    @State private var isPressed = false
-
     var body: some View {
         Button {
             action()
@@ -422,33 +401,13 @@ struct RPEButton: View {
                 .font(.spotterBodyMedium)
                 .foregroundStyle(isSelected ? .white : Color.spotterTextSecondary)
                 .frame(width: 44, height: 44)
-                .background(
-                    Group {
-                        if isSelected {
-                            color
-                        } else {
-                            Color.spotterSurface
-                        }
-                    }
-                )
-                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.sm)
-                        .strokeBorder(
-                            isSelected ? color : Color.spotterBorder,
-                            lineWidth: BorderWidth.thin
-                        )
-                )
-                .scaleEffect(isPressed ? 0.95 : 1.0)
         }
-        .buttonStyle(PlainButtonStyle())
-        .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
-        .animation(SpotterAnimation.bounce, value: isPressed)
+        .buttonStyle(.glass(isSelected ? .regular.tint(color).interactive() : .clear.interactive()))
         .animation(SpotterAnimation.quick, value: isSelected)
     }
 }
 
-// MARK: - Progress Ring
+// MARK: - Progress Ring (Liquid Glass Enhanced)
 
 struct ProgressRing: View {
     let progress: Double // 0.0 to 1.0
@@ -457,9 +416,14 @@ struct ProgressRing: View {
 
     var body: some View {
         ZStack {
+            // Glass background
+            Circle()
+                .glassEffect(.clear, in: Circle())
+
             // Background ring
             Circle()
                 .stroke(Color.spotterBorder, lineWidth: lineWidth)
+                .padding(2)
 
             // Progress arc
             Circle()
@@ -469,13 +433,14 @@ struct ProgressRing: View {
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .padding(2)
                 .animation(SpotterAnimation.standard, value: progress)
         }
         .frame(width: size, height: size)
     }
 }
 
-// MARK: - Empty State
+// MARK: - Empty State (Liquid Glass)
 
 struct EmptyStateView: View {
     let icon: String
@@ -503,6 +468,8 @@ struct EmptyStateView: View {
             Image(systemName: icon)
                 .font(.system(size: 56, weight: .light))
                 .foregroundStyle(Color.spotterTextMuted)
+                .padding()
+                .glassEffect(.clear, in: Circle())
 
             VStack(spacing: Spacing.xs) {
                 Text(title)
@@ -526,7 +493,7 @@ struct EmptyStateView: View {
     }
 }
 
-// MARK: - Animated Checkmark
+// MARK: - Animated Checkmark (Liquid Glass)
 
 struct AnimatedCheckmark: View {
     let isComplete: Bool
@@ -534,15 +501,8 @@ struct AnimatedCheckmark: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(isComplete ? Color.spotterSuccess : Color.spotterSurface)
                 .frame(width: 24, height: 24)
-                .overlay(
-                    Circle()
-                        .strokeBorder(
-                            isComplete ? Color.spotterSuccess : Color.spotterBorder,
-                            lineWidth: BorderWidth.thin
-                        )
-                )
+                .glassEffect(isComplete ? .regular.tint(.spotterSuccess) : .clear, in: Circle())
 
             if isComplete {
                 Image(systemName: "checkmark")
@@ -613,12 +573,82 @@ struct StatRow: View {
     }
 }
 
-// MARK: - Divider
+// MARK: - Divider (Liquid Glass)
 
 struct SpotterDivider: View {
     var body: some View {
         Rectangle()
-            .fill(Color.spotterBorder)
+            .fill(Color.spotterGlassBorder)
             .frame(height: 1)
+    }
+}
+
+// MARK: - Glass Text Field
+
+struct GlassTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    var axis: Axis = .horizontal
+
+    var body: some View {
+        TextField(placeholder, text: $text, axis: axis)
+            .font(.spotterBody)
+            .foregroundStyle(Color.spotterText)
+            .padding(Spacing.sm)
+            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: CornerRadius.sm))
+    }
+}
+
+// MARK: - Glass Icon Button
+
+struct GlassIconButton: View {
+    let icon: String
+    let tint: Color?
+    let action: () -> Void
+
+    init(_ icon: String, tint: Color? = nil, action: @escaping () -> Void) {
+        self.icon = icon
+        self.tint = tint
+        self.action = action
+    }
+
+    var body: some View {
+        Button {
+            HapticManager.selection()
+            action()
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(tint ?? Color.spotterTextSecondary)
+                .frame(width: 36, height: 36)
+        }
+        .buttonStyle(.glass(.clear.interactive()))
+    }
+}
+
+// MARK: - Glass Tab Bar Item
+
+struct GlassTabItem: View {
+    let icon: String
+    let label: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            HapticManager.selection()
+            action()
+        } label: {
+            VStack(spacing: Spacing.xxs) {
+                Image(systemName: icon)
+                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
+                Text(label)
+                    .font(.system(size: 10, weight: .medium))
+            }
+            .foregroundStyle(isSelected ? Color.spotterPrimary : Color.spotterTextMuted)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Spacing.xs)
+        }
+        .buttonStyle(.plain)
     }
 }

@@ -45,22 +45,23 @@ struct HistoryView: View {
     }
 
     private var viewToggle: some View {
-        HStack(spacing: 0) {
-            toggleButton(title: "Calendar", icon: "calendar", isSelected: showingCalendar) {
-                withAnimation(SpotterAnimation.quick) {
-                    showingCalendar = true
+        GlassEffectContainer(spacing: 4) {
+            HStack(spacing: 4) {
+                toggleButton(title: "Calendar", icon: "calendar", isSelected: showingCalendar) {
+                    withAnimation(SpotterAnimation.quick) {
+                        showingCalendar = true
+                    }
                 }
-            }
 
-            toggleButton(title: "List", icon: "list.bullet", isSelected: !showingCalendar) {
-                withAnimation(SpotterAnimation.quick) {
-                    showingCalendar = false
+                toggleButton(title: "List", icon: "list.bullet", isSelected: !showingCalendar) {
+                    withAnimation(SpotterAnimation.quick) {
+                        showingCalendar = false
+                    }
                 }
             }
+            .padding(4)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: CornerRadius.sm))
         }
-        .padding(4)
-        .background(Color.spotterSurface)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
     }
 
     private func toggleButton(title: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
@@ -77,8 +78,10 @@ struct HistoryView: View {
             .foregroundStyle(isSelected ? Color.spotterText : Color.spotterTextMuted)
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.xs)
-            .background(isSelected ? Color.spotterSurfaceElevated : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.xs))
+            .glassEffect(
+                isSelected ? .regular.tint(.spotterPrimary.opacity(0.3)).interactive() : .identity,
+                in: RoundedRectangle(cornerRadius: CornerRadius.xs)
+            )
         }
         .frame(maxWidth: .infinity)
     }
@@ -183,8 +186,8 @@ struct SessionRowView: View {
         }()
 
         return Circle()
-            .fill(color)
             .frame(width: 12, height: 12)
+            .glassEffect(.regular.tint(color), in: Circle())
     }
 }
 

@@ -125,8 +125,7 @@ struct TrendsView: View {
                             }
                             .padding(.horizontal, Spacing.sm)
                             .padding(.vertical, Spacing.xs)
-                            .background(Color.spotterPrimaryMuted)
-                            .clipShape(Capsule())
+                            .glassEffect(.regular.tint(.spotterPrimary.opacity(0.3)), in: Capsule())
 
                             Text("week streak")
                                 .font(.spotterCaption)
@@ -145,42 +144,36 @@ struct TrendsView: View {
         let calendar = Calendar.current
         let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-        return HStack(spacing: Spacing.xs) {
-            ForEach(0..<7, id: \.self) { dayOffset in
-                let date = calendar.date(byAdding: .day, value: dayOffset, to: weekStart)!
-                let hasSession = sessions.contains { calendar.isDate($0.date, inSameDayAs: date) }
-                let isToday = calendar.isDateInToday(date)
-                let isFuture = date > Date()
+        return GlassEffectContainer(spacing: Spacing.xs) {
+            HStack(spacing: Spacing.xs) {
+                ForEach(0..<7, id: \.self) { dayOffset in
+                    let date = calendar.date(byAdding: .day, value: dayOffset, to: weekStart)!
+                    let hasSession = sessions.contains { calendar.isDate($0.date, inSameDayAs: date) }
+                    let isToday = calendar.isDateInToday(date)
 
-                VStack(spacing: Spacing.xs) {
-                    Text(dayLabels[dayOffset])
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(isToday ? Color.spotterPrimary : Color.spotterTextMuted)
+                    VStack(spacing: Spacing.xs) {
+                        Text(dayLabels[dayOffset])
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(isToday ? Color.spotterPrimary : Color.spotterTextMuted)
 
-                    ZStack {
-                        RoundedRectangle(cornerRadius: CornerRadius.xs)
-                            .fill(hasSession ? Color.spotterSuccess : Color.spotterSurface)
-                            .frame(height: 32)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: CornerRadius.xs)
+                                .frame(height: 32)
+                                .glassEffect(
+                                    hasSession ? .regular.tint(.spotterSuccess) :
+                                        isToday ? .regular.tint(.spotterPrimary.opacity(0.2)) : .clear,
+                                    in: RoundedRectangle(cornerRadius: CornerRadius.xs)
+                                )
 
-                        if hasSession {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(.white)
-                        } else if !isFuture {
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(Color.spotterBorder)
-                                .frame(width: 8, height: 2)
+                            if hasSession {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundStyle(.white)
+                            }
                         }
                     }
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CornerRadius.xs)
-                            .strokeBorder(
-                                isToday ? Color.spotterPrimary : Color.clear,
-                                lineWidth: 2
-                            )
-                    )
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
             }
         }
     }

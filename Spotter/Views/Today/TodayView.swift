@@ -8,7 +8,6 @@ struct TodayView: View {
 
     @State private var showingActiveSession = false
     @State private var showingQuickSession = false
-    @State private var headerScale: CGFloat = 1.0
 
     private var lastSession: Session? {
         sessions.first { $0.isCompleted }
@@ -57,8 +56,10 @@ struct TodayView: View {
                     heroHeader
                         .padding(.top, Spacing.md)
 
-                    // Week Progress
-                    weekProgressCard
+                    // Week Progress with Glass Container
+                    GlassEffectContainer(spacing: Spacing.md) {
+                        weekProgressCard
+                    }
 
                     // Last Session
                     if let session = lastSession {
@@ -118,6 +119,9 @@ struct TodayView: View {
                         .font(.spotterBodyMedium)
                         .foregroundStyle(Color.spotterPrimary)
                 }
+                .padding(.horizontal, Spacing.sm)
+                .padding(.vertical, Spacing.xxs)
+                .glassEffect(.regular.tint(.spotterPrimary.opacity(0.3)), in: Capsule())
                 .padding(.top, Spacing.xxs)
             }
         }
@@ -138,6 +142,7 @@ struct TodayView: View {
                             Text("\(weekSessionCount)")
                                 .font(.spotterDisplay)
                                 .foregroundStyle(Color.spotterText)
+                                .contentTransition(.numericText())
 
                             Text("sessions")
                                 .font(.spotterBody)
@@ -166,57 +171,54 @@ struct TodayView: View {
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
         let dayLabels = ["M", "T", "W", "T", "F", "S", "S"]
 
-        return HStack(spacing: 0) {
-            ForEach(0..<7, id: \.self) { dayOffset in
-                let date = calendar.date(byAdding: .day, value: dayOffset, to: weekStart)!
-                let hasSession = sessions.contains { calendar.isDate($0.date, inSameDayAs: date) && $0.isCompleted }
-                let isToday = calendar.isDateInToday(date)
-                let isFuture = date > Date()
+        return GlassEffectContainer(spacing: 0) {
+            HStack(spacing: 0) {
+                ForEach(0..<7, id: \.self) { dayOffset in
+                    let date = calendar.date(byAdding: .day, value: dayOffset, to: weekStart)!
+                    let hasSession = sessions.contains { calendar.isDate($0.date, inSameDayAs: date) && $0.isCompleted }
+                    let isToday = calendar.isDateInToday(date)
 
-                VStack(spacing: Spacing.xxs) {
-                    Text(dayLabels[dayOffset])
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(isToday ? Color.spotterPrimary : Color.spotterTextMuted)
+                    VStack(spacing: Spacing.xxs) {
+                        Text(dayLabels[dayOffset])
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(isToday ? Color.spotterPrimary : Color.spotterTextMuted)
 
-                    ZStack {
-                        Circle()
-                            .fill(hasSession ? Color.spotterSuccess : Color.spotterSurface)
-                            .frame(width: 26, height: 26)
-
-                        if hasSession {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundStyle(.white)
-                        } else if isFuture {
+                        ZStack {
                             Circle()
-                                .fill(Color.spotterBorder)
-                                .frame(width: 5, height: 5)
-                        }
-
-                        if isToday && !hasSession {
-                            Circle()
-                                .strokeBorder(Color.spotterPrimary, lineWidth: 2)
                                 .frame(width: 26, height: 26)
+                                .glassEffect(
+                                    hasSession ? .regular.tint(.spotterSuccess) :
+                                        isToday ? .regular.tint(.spotterPrimary.opacity(0.3)) : .clear,
+                                    in: Circle()
+                                )
+
+                            if hasSession {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundStyle(.white)
+                            }
                         }
                     }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
             }
         }
     }
 
     private var actionButtons: some View {
-        VStack(spacing: Spacing.sm) {
-            // Primary action
-            if nextPlanDay != nil {
-                SpotterButton("Start Session", icon: "flame.fill", style: .primary) {
-                    showingActiveSession = true
+        GlassEffectContainer(spacing: Spacing.sm) {
+            VStack(spacing: Spacing.sm) {
+                // Primary action
+                if nextPlanDay != nil {
+                    SpotterButton("Start Session", icon: "flame.fill", style: .primary) {
+                        showingActiveSession = true
+                    }
                 }
-            }
 
-            // Secondary: Quick session
-            SpotterButton("Quick Session", icon: "bolt.fill", style: .secondary) {
-                showingQuickSession = true
+                // Secondary: Quick session
+                SpotterButton("Quick Session", icon: "bolt.fill", style: .secondary) {
+                    showingQuickSession = true
+                }
             }
         }
         .padding(Spacing.md)
@@ -230,7 +232,6 @@ struct TodayView: View {
             .offset(y: -40),
             alignment: .top
         )
-        .background(Color.spotterBackground)
     }
 }
 

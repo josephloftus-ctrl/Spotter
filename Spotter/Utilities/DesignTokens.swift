@@ -1,44 +1,51 @@
 import SwiftUI
 
 // MARK: - Colors
-// "Spotter" Design System - Cool, supportive, friendly gym buddy aesthetic
+// "Liquid Glass" Design System - Translucent, luminous, fluid
 
 extension Color {
-    // Core palette - deep blue-gray foundation (cool, calm, focused)
-    static let spotterBackground = Color(hex: "0F172A")      // Slate-900: deep but not harsh
-    static let spotterSurface = Color(hex: "1E293B")         // Slate-800: elevated surfaces
-    static let spotterSurfaceElevated = Color(hex: "334155") // Slate-700: cards, modals
+    // Core palette - deep rich backgrounds for glass to pop
+    static let spotterBackground = Color(hex: "0C0C14")      // Deep indigo-black
+    static let spotterSurface = Color(hex: "16162A")         // Slightly elevated
+    static let spotterSurfaceElevated = Color(hex: "1E1E3A") // Glass card base
 
-    // Primary accent - teal/cyan (supportive, fresh, energetic)
-    static let spotterPrimary = Color(hex: "06B6D4")         // Cyan-500: friendly, cool
-    static let spotterPrimaryHover = Color(hex: "0891B2")    // Cyan-600: pressed states
-    static let spotterPrimaryMuted = Color(hex: "06B6D4").opacity(0.15)
+    // Glass tints - for translucent overlays
+    static let spotterGlassTint = Color.white.opacity(0.08)
+    static let spotterGlassHighlight = Color.white.opacity(0.15)
+    static let spotterGlassBorder = Color.white.opacity(0.12)
 
-    // Text hierarchy - clean whites and cool grays
-    static let spotterText = Color(hex: "F8FAFC")            // Slate-50: primary text
-    static let spotterTextSecondary = Color(hex: "94A3B8")   // Slate-400: readable secondary
-    static let spotterTextMuted = Color(hex: "64748B")       // Slate-500: tertiary/disabled
+    // Primary accent - vibrant cyan that glows
+    static let spotterPrimary = Color(hex: "22D3EE")         // Cyan-400: bright, glowing
+    static let spotterPrimaryHover = Color(hex: "06B6D4")    // Cyan-500: pressed
+    static let spotterPrimaryMuted = Color(hex: "22D3EE").opacity(0.12)
+    static let spotterPrimaryGlow = Color(hex: "22D3EE").opacity(0.4)
 
-    // Borders and dividers - subtle cool definition
-    static let spotterBorder = Color(hex: "334155")          // Slate-700: subtle dividers
-    static let spotterBorderLight = Color(hex: "475569")     // Slate-600: more prominent
+    // Text - crisp and luminous
+    static let spotterText = Color(hex: "FFFFFF")            // Pure white for glass
+    static let spotterTextSecondary = Color(hex: "A5B4CB")   // Cool gray
+    static let spotterTextMuted = Color(hex: "6B7A99")       // Muted
 
-    // Semantic colors - friendly and clear
-    static let spotterSuccess = Color(hex: "10B981")         // Emerald-500: achievements
-    static let spotterSuccessMuted = Color(hex: "10B981").opacity(0.15)
-    static let spotterWarning = Color(hex: "F59E0B")         // Amber-500: caution
-    static let spotterError = Color(hex: "F87171")           // Red-400: softer error
+    // Borders - subtle glass edges
+    static let spotterBorder = Color.white.opacity(0.08)
+    static let spotterBorderLight = Color.white.opacity(0.15)
 
-    // RPE intensity gradient - cool to warm
-    static let spotterRPE6 = Color(hex: "10B981")            // Emerald: easy
-    static let spotterRPE7 = Color(hex: "06B6D4")            // Cyan: moderate
-    static let spotterRPE8 = Color(hex: "FBBF24")            // Amber: challenging
-    static let spotterRPE9 = Color(hex: "FB923C")            // Orange: hard
-    static let spotterRPE10 = Color(hex: "F87171")           // Red: max effort
+    // Semantic colors - vibrant on dark glass
+    static let spotterSuccess = Color(hex: "34D399")         // Emerald-400: bright
+    static let spotterSuccessMuted = Color(hex: "34D399").opacity(0.15)
+    static let spotterWarning = Color(hex: "FBBF24")         // Amber-400
+    static let spotterError = Color(hex: "FB7185")           // Rose-400
 
-    // Gradient stops - cool supportive vibe
-    static let spotterGradientStart = Color(hex: "06B6D4")   // Cyan
-    static let spotterGradientEnd = Color(hex: "8B5CF6")     // Violet-500
+    // RPE intensity - glowing scale
+    static let spotterRPE6 = Color(hex: "34D399")            // Emerald
+    static let spotterRPE7 = Color(hex: "22D3EE")            // Cyan
+    static let spotterRPE8 = Color(hex: "FBBF24")            // Amber
+    static let spotterRPE9 = Color(hex: "FB923C")            // Orange
+    static let spotterRPE10 = Color(hex: "FB7185")           // Rose
+
+    // Gradient stops - ethereal glow
+    static let spotterGradientStart = Color(hex: "22D3EE")   // Cyan
+    static let spotterGradientMid = Color(hex: "A78BFA")     // Violet-400
+    static let spotterGradientEnd = Color(hex: "F472B6")     // Pink-400
 
     // Hex initializer
     init(hex: String) {
@@ -67,25 +74,43 @@ extension Color {
 // MARK: - Gradients
 
 extension LinearGradient {
-    // Primary action gradient - fiery, energetic
+    // Primary action gradient - vibrant cyan to violet
     static let spotterPrimaryGradient = LinearGradient(
-        colors: [Color.spotterGradientStart, Color.spotterGradientEnd],
+        colors: [Color.spotterGradientStart, Color.spotterGradientMid, Color.spotterGradientEnd],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    // Subtle surface gradient - depth without distraction
-    static let spotterSurfaceGradient = LinearGradient(
-        colors: [Color.spotterSurface, Color.spotterSurfaceElevated.opacity(0.5)],
+    // Glass highlight - top edge shine
+    static let spotterGlassHighlightGradient = LinearGradient(
+        colors: [Color.white.opacity(0.2), Color.white.opacity(0.05), Color.clear],
         startPoint: .top,
         endPoint: .bottom
     )
 
-    // Card highlight - subtle glow on top edge
+    // Glass edge - subtle border glow
+    static let spotterGlassEdge = LinearGradient(
+        colors: [Color.white.opacity(0.2), Color.white.opacity(0.05)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Card highlight - subtle inner glow
     static let spotterCardHighlight = LinearGradient(
-        colors: [Color.white.opacity(0.05), Color.clear],
+        colors: [Color.white.opacity(0.08), Color.clear],
         startPoint: .top,
         endPoint: .center
+    )
+
+    // Mesh-style background gradient
+    static let spotterMeshGradient = LinearGradient(
+        colors: [
+            Color(hex: "0C0C14"),
+            Color(hex: "0F1629"),
+            Color(hex: "0C0C14")
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
     )
 }
 

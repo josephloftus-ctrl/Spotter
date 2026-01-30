@@ -62,15 +62,11 @@ struct SettingsView: View {
 
                 if let plan = activePlan {
                     HStack(spacing: Spacing.md) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.spotterSuccess.opacity(0.15))
-                                .frame(width: 48, height: 48)
-
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 24))
-                                .foregroundStyle(Color.spotterSuccess)
-                        }
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(Color.spotterSuccess)
+                            .frame(width: 48, height: 48)
+                            .glassEffect(.regular.tint(.spotterSuccess.opacity(0.3)), in: Circle())
 
                         VStack(alignment: .leading, spacing: Spacing.xxs) {
                             Text(plan.name)
@@ -86,15 +82,11 @@ struct SettingsView: View {
                     }
                 } else {
                     HStack(spacing: Spacing.md) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.spotterSurface)
-                                .frame(width: 48, height: 48)
-
-                            Image(systemName: "calendar.badge.plus")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color.spotterTextMuted)
-                        }
+                        Image(systemName: "calendar.badge.plus")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color.spotterTextMuted)
+                            .frame(width: 48, height: 48)
+                            .glassEffect(.clear, in: Circle())
 
                         Text("No active plan")
                             .font(.spotterBody)
@@ -121,15 +113,11 @@ struct SettingsView: View {
                     HapticManager.selection()
                 } label: {
                     HStack(spacing: Spacing.md) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.spotterPrimaryMuted)
-                                .frame(width: 48, height: 48)
-
-                            Image(systemName: "dumbbell.fill")
-                                .font(.system(size: 18))
-                                .foregroundStyle(Color.spotterPrimary)
-                        }
+                        Image(systemName: "dumbbell.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.spotterPrimary)
+                            .frame(width: 48, height: 48)
+                            .glassEffect(.regular.tint(.spotterPrimary.opacity(0.3)).interactive(), in: Circle())
 
                         VStack(alignment: .leading, spacing: Spacing.xxs) {
                             Text("Browse Exercises")
