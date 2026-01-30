@@ -8,6 +8,13 @@ struct TodayView: View {
 
     @State private var showingActiveSession = false
     @State private var showingQuickSession = false
+    @State private var showingClimbingSession = false
+
+    @Query(filter: #Predicate<Gym> { $0.isDefault }) private var defaultGyms: [Gym]
+
+    private var defaultGym: Gym? {
+        defaultGyms.first
+    }
 
     private var lastSession: Session? {
         sessions.first { $0.isCompleted }
@@ -94,6 +101,11 @@ struct TodayView: View {
             }
             .fullScreenCover(isPresented: $showingQuickSession) {
                 ActiveSessionView(planDay: nil)
+            }
+            .fullScreenCover(isPresented: $showingClimbingSession) {
+                if let gym = defaultGym {
+                    ActiveClimbingSessionView(gym: gym)
+                }
             }
         }
     }
@@ -208,16 +220,22 @@ struct TodayView: View {
     private var actionButtons: some View {
         GlassEffectContainer(spacing: Spacing.sm) {
             VStack(spacing: Spacing.sm) {
-                // Primary action
+                // Primary lifting actions
                 if nextPlanDay != nil {
-                    SpotterButton("Start Session", icon: "flame.fill", style: .primary) {
+                    SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
                         showingActiveSession = true
+                    }
+                } else {
+                    SpotterButton("Start Lifting", icon: "dumbbell.fill", style: .primary) {
+                        showingQuickSession = true
                     }
                 }
 
-                // Secondary: Quick session
-                SpotterButton("Quick Session", icon: "bolt.fill", style: .secondary) {
-                    showingQuickSession = true
+                // Climbing session
+                if defaultGym != nil {
+                    SpotterButton("Start Climbing", icon: "mountain.2.fill", style: .secondary) {
+                        showingClimbingSession = true
+                    }
                 }
             }
         }
@@ -243,6 +261,9 @@ struct TodayView: View {
             SetEntry.self,
             TrainingPlan.self,
             PlanDay.self,
-            PlannedExercise.self
+            PlannedExercise.self,
+            Gym.self,
+            Wall.self,
+            Climb.self
         ], inMemory: true)
 }

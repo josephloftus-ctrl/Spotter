@@ -3,6 +3,8 @@ import SwiftData
 
 @main
 struct SpotterApp: App {
+    @StateObject private var healthKitManager = HealthKitManager.shared
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Exercise.self,
@@ -10,7 +12,10 @@ struct SpotterApp: App {
             SetEntry.self,
             TrainingPlan.self,
             PlanDay.self,
-            PlannedExercise.self
+            PlannedExercise.self,
+            Gym.self,
+            Wall.self,
+            Climb.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -33,6 +38,11 @@ struct SpotterApp: App {
                 .preferredColorScheme(.dark)
                 .onAppear {
                     ExerciseSeeder.seedDefaultExercises(modelContext: sharedModelContainer.mainContext)
+                    GymSeeder.seedDefaultGyms(modelContext: sharedModelContainer.mainContext)
+                }
+                .task {
+                    // Request HealthKit authorization
+                    _ = await healthKitManager.requestAuthorization()
                 }
         }
         .modelContainer(sharedModelContainer)

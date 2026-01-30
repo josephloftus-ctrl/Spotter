@@ -37,6 +37,19 @@
 		A1000028 /* DefaultExercises.json in Resources */ = {isa = PBXBuildFile; fileRef = A2000028; };
 		A1000029 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000029; };
 		A1000030 /* SpotterComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030; };
+		A1000031 /* SessionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031; };
+		A1000032 /* ClimbingGrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032; };
+		A1000033 /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000033; };
+		A1000034 /* Wall.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000034; };
+		A1000035 /* Climb.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000035; };
+		A1000036 /* GymSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000036; };
+		A1000037 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000037; };
+		A1000038 /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000038; };
+		A1000039 /* ActiveClimbingSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000039; };
+		A1000040 /* ClimbingSessionCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000040; };
+		A1000041 /* GradeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000041; };
+		A1000042 /* ResultPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000042; };
+		A1000043 /* WallSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000043; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +83,19 @@
 		A2000028 /* DefaultExercises.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DefaultExercises.json; sourceTree = "<group>"; };
 		A2000029 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000030 /* SpotterComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotterComponents.swift; sourceTree = "<group>"; };
+		A2000031 /* SessionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionType.swift; sourceTree = "<group>"; };
+		A2000032 /* ClimbingGrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingGrade.swift; sourceTree = "<group>"; };
+		A2000033 /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
+		A2000034 /* Wall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wall.swift; sourceTree = "<group>"; };
+		A2000035 /* Climb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Climb.swift; sourceTree = "<group>"; };
+		A2000036 /* GymSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSeeder.swift; sourceTree = "<group>"; };
+		A2000037 /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
+		A2000038 /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
+		A2000039 /* ActiveClimbingSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveClimbingSessionView.swift; sourceTree = "<group>"; };
+		A2000040 /* ClimbingSessionCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbingSessionCompleteView.swift; sourceTree = "<group>"; };
+		A2000041 /* GradeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeSelector.swift; sourceTree = "<group>"; };
+		A2000042 /* ResultPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultPicker.swift; sourceTree = "<group>"; };
+		A2000043 /* WallSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallSelector.swift; sourceTree = "<group>"; };
 		A3000001 /* Spotter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spotter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -125,8 +151,21 @@
 				A2000008 /* TrainingPlan.swift */,
 				A2000009 /* PlanDay.swift */,
 				A2000010 /* PlannedExercise.swift */,
+				A2000031 /* SessionType.swift */,
+				A5000015 /* Climbing */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		A5000015 /* Climbing */ = {
+			isa = PBXGroup;
+			children = (
+				A2000032 /* ClimbingGrade.swift */,
+				A2000033 /* Gym.swift */,
+				A2000034 /* Wall.swift */,
+				A2000035 /* Climb.swift */,
+			);
+			path = Climbing;
 			sourceTree = "<group>";
 		};
 		A5000005 /* Views */ = {
@@ -134,12 +173,25 @@
 			children = (
 				A5000006 /* Today */,
 				A5000007 /* Session */,
+				A5000016 /* Climbing */,
 				A5000008 /* History */,
 				A5000009 /* Trends */,
 				A5000010 /* Settings */,
 				A5000014 /* Plan */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		A5000016 /* Climbing */ = {
+			isa = PBXGroup;
+			children = (
+				A2000039 /* ActiveClimbingSessionView.swift */,
+				A2000040 /* ClimbingSessionCompleteView.swift */,
+				A2000041 /* GradeSelector.swift */,
+				A2000042 /* ResultPicker.swift */,
+				A2000043 /* WallSelector.swift */,
+			);
+			path = Climbing;
 			sourceTree = "<group>";
 		};
 		A5000006 /* Today */ = {
@@ -204,6 +256,9 @@
 			isa = PBXGroup;
 			children = (
 				A2000027 /* ExerciseSeeder.swift */,
+				A2000036 /* GymSeeder.swift */,
+				A2000037 /* HealthKitManager.swift */,
+				A2000038 /* WatchConnectivityManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -323,6 +378,19 @@
 				A1000026 /* ExerciseLibraryView.swift in Sources */,
 				A1000027 /* ExerciseSeeder.swift in Sources */,
 				A1000030 /* SpotterComponents.swift in Sources */,
+				A1000031 /* SessionType.swift in Sources */,
+				A1000032 /* ClimbingGrade.swift in Sources */,
+				A1000033 /* Gym.swift in Sources */,
+				A1000034 /* Wall.swift in Sources */,
+				A1000035 /* Climb.swift in Sources */,
+				A1000036 /* GymSeeder.swift in Sources */,
+				A1000037 /* HealthKitManager.swift in Sources */,
+				A1000038 /* WatchConnectivityManager.swift in Sources */,
+				A1000039 /* ActiveClimbingSessionView.swift in Sources */,
+				A1000040 /* ClimbingSessionCompleteView.swift in Sources */,
+				A1000041 /* GradeSelector.swift in Sources */,
+				A1000042 /* ResultPicker.swift in Sources */,
+				A1000043 /* WallSelector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -461,6 +529,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Spotter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Spotter uses your heart rate data to track workout intensity during climbing and lifting sessions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Spotter saves your workout data to the Health app.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -492,6 +562,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Spotter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Spotter uses your heart rate data to track workout intensity during climbing and lifting sessions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Spotter saves your workout data to the Health app.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
