@@ -9,79 +9,151 @@ struct SessionCompleteView: View {
     @State private var sessionRPE: Int = 3
     @State private var selectedPainTags: Set<String> = []
     @State private var notes: String = ""
+    @State private var showContent = false
 
     private let painTagOptions = [
         "Shoulders", "Lower Back", "Upper Back", "Knees",
         "Elbows", "Wrists", "Hips", "Neck"
     ]
 
-    private let rpeEmojis = ["😫", "😓", "😐", "💪", "🔥"]
+    private let rpeLabels = ["Rough", "Hard", "Okay", "Good", "Great"]
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: Spacing.lg) {
-                    // Session Summary
-                    sessionSummary
+            ZStack {
+                Color.spotterBackground.ignoresSafeArea()
 
-                    Divider()
-                        .foregroundStyle(Color.spotterBorder)
+                ScrollView {
+                    VStack(spacing: Spacing.xl) {
+                        // Session Summary - Hero Section
+                        sessionSummary
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
 
-                    // Feel Rating
-                    feelRating
+                        // Feel Rating
+                        feelRating
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
+                            .animation(SpotterAnimation.standard.delay(0.1), value: showContent)
 
-                    // Pain Tags
-                    painTagSection
+                        // Pain Tags
+                        painTagSection
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
+                            .animation(SpotterAnimation.standard.delay(0.2), value: showContent)
 
-                    // Notes
-                    notesSection
+                        // Notes
+                        notesSection
+                            .opacity(showContent ? 1 : 0)
+                            .offset(y: showContent ? 0 : 20)
+                            .animation(SpotterAnimation.standard.delay(0.3), value: showContent)
+                    }
+                    .padding(Spacing.md)
+                    .padding(.bottom, 100)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                SpotterButton("Save Session", icon: "checkmark", style: .primary) {
+                    saveSession()
                 }
                 .padding(Spacing.md)
+                .background(Color.spotterBackground)
             }
-            .background(Color.spotterBackground)
-            .navigationTitle("Session Complete")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Save") {
-                        saveSession()
-                    }
-                    .font(.spotterHeadline)
-                    .foregroundStyle(Color.spotterPrimary)
+                ToolbarItem(placement: .principal) {
+                    Text("Session Complete")
+                        .font(.spotterHeadline)
+                        .foregroundStyle(Color.spotterText)
+                }
+            }
+            .onAppear {
+                withAnimation(SpotterAnimation.standard) {
+                    showContent = true
                 }
             }
         }
     }
 
     private var sessionSummary: some View {
-        VStack(spacing: Spacing.md) {
-            Image(systemName: "checkmark.circle")
-                .font(.system(size: 64))
-                .foregroundStyle(Color.spotterSuccess)
+        VStack(spacing: Spacing.lg) {
+            // Success icon with glow effect
+            ZStack {
+                Circle()
+                    .fill(Color.spotterSuccess.opacity(0.15))
+                    .frame(width: 120, height: 120)
 
+                Circle()
+                    .fill(Color.spotterSuccess.opacity(0.1))
+                    .frame(width: 100, height: 100)
+
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 64))
+                    .foregroundStyle(Color.spotterSuccess)
+            }
+            .spotterGlow()
+
+            // Duration as hero metric
             if let duration = session.duration {
-                Text(DateFormatters.formatDuration(duration))
-                    .font(.spotterTitle)
-                    .foregroundStyle(Color.spotterText)
+                VStack(spacing: Spacing.xxs) {
+                    Text(DateFormatters.formatDuration(duration))
+                        .font(.spotterDisplay)
+                        .foregroundStyle(Color.spotterText)
+
+                    Text("DURATION")
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .tracking(1)
+                }
             }
 
-            HStack(spacing: Spacing.lg) {
-                statItem(value: "\(session.sets.count)", label: "sets")
-                statItem(value: "\(session.exerciseCount)", label: "exercises")
-                statItem(value: formatVolume(session.totalVolume), label: "volume")
+            // Stats row
+            HStack(spacing: 0) {
+                Spacer()
+                summaryStatItem(
+                    value: "\(session.sets.count)",
+                    label: "Sets",
+                    icon: "square.stack.fill"
+                )
+                Spacer()
+                SpotterDivider()
+                    .frame(height: 40)
+                Spacer()
+                summaryStatItem(
+                    value: "\(session.exerciseCount)",
+                    label: "Exercises",
+                    icon: "dumbbell.fill"
+                )
+                Spacer()
+                SpotterDivider()
+                    .frame(height: 40)
+                Spacer()
+                summaryStatItem(
+                    value: formatVolume(session.totalVolume),
+                    label: "Volume",
+                    icon: "scalemass.fill"
+                )
+                Spacer()
             }
+            .padding(.vertical, Spacing.md)
+            .background(Color.spotterSurfaceElevated)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
         }
-        .padding(Spacing.lg)
     }
 
-    private func statItem(value: String, label: String) -> some View {
+    private func summaryStatItem(value: String, label: String, icon: String) -> some View {
         VStack(spacing: Spacing.xs) {
             Text(value)
-                .font(.spotterHeadline)
+                .font(.spotterMediumNumber)
                 .foregroundStyle(Color.spotterText)
-            Text(label)
-                .font(.spotterCaption)
-                .foregroundStyle(Color.spotterTextSecondary)
+
+            HStack(spacing: Spacing.xxs) {
+                Image(systemName: icon)
+                    .font(.system(size: 10))
+                Text(label)
+                    .font(.spotterCaption)
+            }
+            .foregroundStyle(Color.spotterTextMuted)
         }
     }
 
@@ -93,95 +165,112 @@ struct SessionCompleteView: View {
     }
 
     private var feelRating: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("How did it feel?")
-                .font(.spotterLabel)
-                .foregroundStyle(Color.spotterText)
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                SectionHeader("How did it feel?")
 
-            HStack(spacing: Spacing.md) {
-                ForEach(1...5, id: \.self) { rating in
-                    Button {
-                        sessionRPE = rating
-                        HapticManager.selection()
-                    } label: {
-                        Text(rpeEmojis[rating - 1])
-                            .font(.system(size: 32))
-                            .padding(Spacing.sm)
-                            .background(
-                                Circle()
-                                    .fill(sessionRPE == rating ? Color.spotterPrimary.opacity(Opacity.subtle) : Color.clear)
-                            )
-                            .overlay(
-                                Circle()
-                                    .strokeBorder(sessionRPE == rating ? Color.spotterPrimary : Color.clear, lineWidth: BorderWidth.medium)
-                            )
+                HStack(spacing: Spacing.sm) {
+                    ForEach(1...5, id: \.self) { rating in
+                        Button {
+                            withAnimation(SpotterAnimation.bounce) {
+                                sessionRPE = rating
+                            }
+                            HapticManager.selection()
+                        } label: {
+                            VStack(spacing: Spacing.xs) {
+                                ZStack {
+                                    Circle()
+                                        .fill(sessionRPE == rating ? ratingColor(for: rating) : Color.spotterSurface)
+                                        .frame(width: 52, height: 52)
+
+                                    Circle()
+                                        .strokeBorder(
+                                            sessionRPE == rating ? ratingColor(for: rating) : Color.spotterBorder,
+                                            lineWidth: sessionRPE == rating ? 2 : 1
+                                        )
+                                        .frame(width: 52, height: 52)
+
+                                    Text("\(rating)")
+                                        .font(.spotterHeadline)
+                                        .foregroundStyle(sessionRPE == rating ? .white : Color.spotterTextSecondary)
+                                }
+                                .scaleEffect(sessionRPE == rating ? 1.1 : 1.0)
+
+                                Text(rpeLabels[rating - 1])
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(sessionRPE == rating ? ratingColor(for: rating) : Color.spotterTextMuted)
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
+                .frame(maxWidth: .infinity)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func ratingColor(for rating: Int) -> Color {
+        switch rating {
+        case 1: return .spotterRPE10
+        case 2: return .spotterRPE9
+        case 3: return .spotterRPE8
+        case 4: return .spotterRPE7
+        case 5: return .spotterSuccess
+        default: return .spotterTextSecondary
+        }
     }
 
     private var painTagSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("Any discomfort?")
-                .font(.spotterLabel)
-                .foregroundStyle(Color.spotterText)
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                VStack(alignment: .leading, spacing: Spacing.xxs) {
+                    SectionHeader("Any discomfort?")
+                    Text("Optional — helps track patterns over time")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+                }
 
-            Text("Optional — helps track patterns")
-                .font(.spotterCaption)
-                .foregroundStyle(Color.spotterTextSecondary)
-
-            FlowLayout(spacing: Spacing.sm) {
-                ForEach(painTagOptions, id: \.self) { tag in
-                    Button {
-                        togglePainTag(tag)
-                        HapticManager.selection()
-                    } label: {
-                        Text(tag)
-                            .font(.spotterBody)
-                            .padding(.horizontal, Spacing.md)
-                            .padding(.vertical, Spacing.sm)
-                            .background(
-                                RoundedRectangle(cornerRadius: CornerRadius.sm)
-                                    .fill(selectedPainTags.contains(tag) ? Color.spotterWarning : Color.clear)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: CornerRadius.sm)
-                                    .strokeBorder(selectedPainTags.contains(tag) ? Color.spotterWarning : Color.spotterBorder, lineWidth: BorderWidth.thin)
-                            )
-                            .foregroundStyle(selectedPainTags.contains(tag) ? .white : Color.spotterText)
+                FlowLayout(spacing: Spacing.sm) {
+                    ForEach(painTagOptions, id: \.self) { tag in
+                        SpotterChip(
+                            label: tag,
+                            isSelected: selectedPainTags.contains(tag)
+                        ) {
+                            togglePainTag(tag)
+                        }
                     }
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var notesSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("Notes")
-                .font(.spotterLabel)
-                .foregroundStyle(Color.spotterText)
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
+                SectionHeader("Notes", subtitle: "Optional")
 
-            TextField("Optional notes...", text: $notes, axis: .vertical)
-                .font(.spotterBody)
-                .padding(Spacing.sm)
-                .background(Color.spotterBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.sm)
-                        .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
-                )
-                .lineLimit(3...6)
+                TextField("How was the session?", text: $notes, axis: .vertical)
+                    .font(.spotterBody)
+                    .foregroundStyle(Color.spotterText)
+                    .padding(Spacing.sm)
+                    .background(Color.spotterSurface)
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CornerRadius.sm)
+                            .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                    )
+                    .lineLimit(3...6)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func togglePainTag(_ tag: String) {
-        if selectedPainTags.contains(tag) {
-            selectedPainTags.remove(tag)
-        } else {
-            selectedPainTags.insert(tag)
+        withAnimation(SpotterAnimation.quick) {
+            if selectedPainTags.contains(tag) {
+                selectedPainTags.remove(tag)
+            } else {
+                selectedPainTags.insert(tag)
+            }
         }
     }
 

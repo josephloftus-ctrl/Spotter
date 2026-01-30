@@ -29,7 +29,6 @@ struct CalendarView: View {
             }
         }
 
-        // Pad to complete last week
         while days.count % 7 != 0 {
             days.append(nil)
         }
@@ -40,49 +39,26 @@ struct CalendarView: View {
     var body: some View {
         VStack(spacing: Spacing.md) {
             // Month Navigation
-            HStack {
-                Button {
-                    displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth)!
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(Color.spotterPrimary)
-                }
-
-                Spacer()
-
-                Text(DateFormatters.monthYear.string(from: displayedMonth))
-                    .font(.spotterHeadline)
-                    .foregroundStyle(Color.spotterText)
-
-                Spacer()
-
-                Button {
-                    displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth)!
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(Color.spotterPrimary)
-                }
-            }
-            .padding(.horizontal, Spacing.md)
+            monthNavigation
 
             // Day Headers
             HStack {
                 ForEach(daysOfWeek, id: \.self) { day in
                     Text(day)
-                        .font(.spotterCaption)
-                        .foregroundStyle(Color.spotterTextSecondary)
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterTextMuted)
                         .frame(maxWidth: .infinity)
                 }
             }
 
             // Calendar Grid
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: Spacing.sm) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: Spacing.xs) {
                 ForEach(Array(daysInMonth.enumerated()), id: \.offset) { _, date in
                     if let date = date {
                         dayCell(for: date)
                     } else {
                         Color.clear
-                            .frame(height: 44)
+                            .frame(height: 48)
                     }
                 }
             }
@@ -92,25 +68,67 @@ struct CalendarView: View {
         .padding(Spacing.md)
     }
 
+    private var monthNavigation: some View {
+        HStack {
+            Button {
+                withAnimation(SpotterAnimation.quick) {
+                    displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth)!
+                }
+                HapticManager.selection()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color.spotterPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(Color.spotterSurface)
+                    .clipShape(Circle())
+            }
+
+            Spacer()
+
+            Text(DateFormatters.monthYear.string(from: displayedMonth))
+                .font(.spotterHeadline)
+                .foregroundStyle(Color.spotterText)
+
+            Spacer()
+
+            Button {
+                withAnimation(SpotterAnimation.quick) {
+                    displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth)!
+                }
+                HapticManager.selection()
+            } label: {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color.spotterPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(Color.spotterSurface)
+                    .clipShape(Circle())
+            }
+        }
+    }
+
     private func dayCell(for date: Date) -> some View {
         let components = calendar.dateComponents([.year, .month, .day], from: date)
         let hasSession = sessionDates.contains(components)
         let isToday = calendar.isDateInToday(date)
         let sessionForDate = sessions.first { calendar.isDate($0.date, inSameDayAs: date) }
+        let isFuture = date > Date()
 
         return Button {
             if let session = sessionForDate {
                 selectedSession = session
+                HapticManager.selection()
             }
         } label: {
-            VStack(spacing: 2) {
+            VStack(spacing: 4) {
                 Text("\(calendar.component(.day, from: date))")
-                    .font(.spotterBody)
-                    .foregroundStyle(isToday ? .white : Color.spotterText)
+                    .font(.spotterBodyMedium)
+                    .foregroundStyle(dayTextColor(isToday: isToday, hasSession: hasSession, isFuture: isFuture))
 
                 if hasSession {
                     Circle()
-                        .fill(isToday ? .white : Color.spotterPrimary)
+                        .fill(isToday ? .white : Color.spotterSuccess)
                         .frame(width: 6, height: 6)
                 } else {
                     Circle()
@@ -119,14 +137,43 @@ struct CalendarView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .background(isToday ? Color.spotterPrimary : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+            .frame(height: 48)
+            .background(
+                ZStack {
+                    if isToday {
+                        RoundedRectangle(cornerRadius: CornerRadius.sm)
+                            .fill(LinearGradient.spotterPrimaryGradient)
+                    } else if hasSession {
+                        RoundedRectangle(cornerRadius: CornerRadius.sm)
+                            .fill(Color.spotterSuccess.opacity(0.1))
+                    }
+                }
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: CornerRadius.sm)
+                    .strokeBorder(
+                        hasSession && !isToday ? Color.spotterSuccess.opacity(0.3) : Color.clear,
+                        lineWidth: BorderWidth.thin
+                    )
+            )
         }
         .disabled(!hasSession)
+    }
+
+    private func dayTextColor(isToday: Bool, hasSession: Bool, isFuture: Bool) -> Color {
+        if isToday {
+            return .white
+        } else if isFuture {
+            return Color.spotterTextMuted
+        } else if hasSession {
+            return Color.spotterText
+        } else {
+            return Color.spotterTextSecondary
+        }
     }
 }
 
 #Preview {
     CalendarView(sessions: [], selectedSession: .constant(nil))
+        .background(Color.spotterBackground)
 }

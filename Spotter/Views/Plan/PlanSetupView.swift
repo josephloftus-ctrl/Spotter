@@ -9,6 +9,7 @@ struct PlanSetupView: View {
     @State private var daysPerWeek = 3
     @State private var days: [DayEntry] = []
     @State private var notes = ""
+    @State private var expandedDayId: UUID?
 
     struct DayEntry: Identifiable {
         let id = UUID()
@@ -23,110 +24,325 @@ struct PlanSetupView: View {
         var reps: String
     }
 
+    private var canSave: Bool {
+        !planName.isEmpty && !days.isEmpty && days.contains { !$0.exercises.isEmpty }
+    }
+
     var body: some View {
         NavigationStack {
-            Form {
-                // Plan Info
-                Section("Plan Details") {
-                    TextField("Plan Name", text: $planName)
+            ZStack {
+                Color.spotterBackground.ignoresSafeArea()
 
-                    Stepper("Days per week: \(daysPerWeek)", value: $daysPerWeek, in: 1...7)
-                }
+                ScrollView {
+                    VStack(spacing: Spacing.lg) {
+                        // Plan Details
+                        planDetailsSection
 
-                // Days
-                Section("Training Days") {
-                    ForEach($days) { $day in
-                        daySection(day: $day)
+                        // Training Days
+                        trainingDaysSection
+
+                        // Notes
+                        notesSection
+
+                        // Save button
+                        SpotterButton("Create Plan", icon: "checkmark", style: .primary) {
+                            savePlan()
+                        }
+                        .disabled(!canSave)
+                        .opacity(canSave ? 1.0 : 0.5)
+                        .padding(.top, Spacing.md)
                     }
-
-                    Button {
-                        addDay()
-                    } label: {
-                        Label("Add Day", systemImage: "plus")
-                            .foregroundStyle(Color.spotterPrimary)
-                    }
-                }
-
-                // Notes
-                Section("Notes") {
-                    TextField("Optional notes...", text: $notes, axis: .vertical)
-                        .lineLimit(3...6)
+                    .padding(Spacing.md)
+                    .padding(.bottom, Spacing.xl)
                 }
             }
             .navigationTitle("Create Plan")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.spotterTextSecondary)
                     }
-                    .foregroundStyle(Color.spotterPrimary)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        savePlan()
-                    }
-                    .disabled(planName.isEmpty || days.isEmpty)
-                    .foregroundStyle(planName.isEmpty || days.isEmpty ? Color.spotterTextSecondary : Color.spotterPrimary)
                 }
             }
             .onAppear {
                 if days.isEmpty {
-                    // Add initial day
                     addDay()
                 }
             }
         }
     }
 
-    private func daySection(day: Binding<DayEntry>) -> some View {
-        DisclosureGroup {
-            ForEach(day.exercises) { $exercise in
-                exerciseRow(exercise: $exercise)
-            }
+    private var planDetailsSection: some View {
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                SectionHeader("Plan Details")
 
-            Button {
-                day.wrappedValue.exercises.append(ExerciseEntry(name: "", sets: 3, reps: "8-12"))
-            } label: {
-                Label("Add Exercise", systemImage: "plus")
-                    .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterPrimary)
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text("Plan Name")
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterTextSecondary)
+
+                    TextField("e.g., Upper/Lower Split", text: $planName)
+                        .font(.spotterBody)
+                        .foregroundStyle(Color.spotterText)
+                        .padding(Spacing.sm)
+                        .background(Color.spotterSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                        )
+                }
+
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text("Days Per Week")
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterTextSecondary)
+
+                    HStack(spacing: Spacing.sm) {
+                        ForEach(1...7, id: \.self) { num in
+                            Button {
+                                daysPerWeek = num
+                                HapticManager.selection()
+                            } label: {
+                                Text("\(num)")
+                                    .font(.spotterBodyMedium)
+                                    .foregroundStyle(daysPerWeek == num ? .white : Color.spotterTextSecondary)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(daysPerWeek == num ? Color.spotterPrimary : Color.spotterSurface)
+                                    )
+                                    .overlay(
+                                        Circle()
+                                            .strokeBorder(
+                                                daysPerWeek == num ? Color.clear : Color.spotterBorder,
+                                                lineWidth: BorderWidth.thin
+                                            )
+                                    )
+                            }
+                        }
+                    }
+                }
             }
-        } label: {
-            TextField("Day Name", text: day.name)
-                .font(.spotterHeadline)
-                .foregroundStyle(Color.spotterText)
         }
     }
 
-    private func exerciseRow(exercise: Binding<ExerciseEntry>) -> some View {
-        VStack(spacing: Spacing.sm) {
-            TextField("Exercise Name", text: exercise.name)
-                .foregroundStyle(Color.spotterText)
+    private var trainingDaysSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.md) {
+            SectionHeader("Training Days", subtitle: "\(days.count) configured")
 
+            ForEach($days) { $day in
+                dayCard(day: $day)
+            }
+
+            Button {
+                addDay()
+            } label: {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 20))
+                    Text("Add Training Day")
+                        .font(.spotterBodyMedium)
+                }
+                .foregroundStyle(Color.spotterPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(Spacing.md)
+                .background(Color.spotterPrimaryMuted)
+                .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
+            }
+        }
+    }
+
+    private func dayCard(day: Binding<DayEntry>) -> some View {
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                // Day header
+                HStack {
+                    TextField("Day Name", text: day.name)
+                        .font(.spotterHeadline)
+                        .foregroundStyle(Color.spotterText)
+
+                    Spacer()
+
+                    Button {
+                        withAnimation(SpotterAnimation.quick) {
+                            if expandedDayId == day.wrappedValue.id {
+                                expandedDayId = nil
+                            } else {
+                                expandedDayId = day.wrappedValue.id
+                            }
+                        }
+                    } label: {
+                        Image(systemName: expandedDayId == day.wrappedValue.id ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.spotterTextMuted)
+                    }
+                }
+
+                if expandedDayId == day.wrappedValue.id {
+                    SpotterDivider()
+
+                    // Exercises
+                    VStack(spacing: Spacing.sm) {
+                        ForEach(day.exercises) { $exercise in
+                            exerciseRow(exercise: $exercise, day: day)
+                        }
+                    }
+
+                    // Add exercise button
+                    Button {
+                        day.wrappedValue.exercises.append(
+                            ExerciseEntry(name: "", sets: 3, reps: "8-12")
+                        )
+                        HapticManager.selection()
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Add Exercise")
+                        }
+                        .font(.spotterCaptionMedium)
+                        .foregroundStyle(Color.spotterPrimary)
+                    }
+                    .padding(.top, Spacing.xs)
+                } else {
+                    // Collapsed preview
+                    Text("\(day.wrappedValue.exercises.filter { !$0.name.isEmpty }.count) exercises")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+                }
+            }
+        }
+    }
+
+    private func exerciseRow(exercise: Binding<ExerciseEntry>, day: Binding<DayEntry>) -> some View {
+        VStack(spacing: Spacing.sm) {
             HStack {
-                Stepper("Sets: \(exercise.wrappedValue.sets)", value: exercise.sets, in: 1...10)
+                TextField("Exercise name", text: exercise.name)
+                    .font(.spotterBody)
+                    .foregroundStyle(Color.spotterText)
+                    .padding(Spacing.sm)
+                    .background(Color.spotterSurface)
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+
+                Button {
+                    day.wrappedValue.exercises.removeAll { $0.id == exercise.wrappedValue.id }
+                    HapticManager.selection()
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.spotterError)
+                }
+            }
+
+            HStack(spacing: Spacing.md) {
+                // Sets
+                HStack(spacing: Spacing.xs) {
+                    Text("Sets:")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+
+                    HStack(spacing: 0) {
+                        Button {
+                            if exercise.wrappedValue.sets > 1 {
+                                exercise.wrappedValue.sets -= 1
+                                HapticManager.selection()
+                            }
+                        } label: {
+                            Image(systemName: "minus")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Color.spotterTextSecondary)
+                                .frame(width: 28, height: 28)
+                                .background(Color.spotterSurface)
+                        }
+
+                        Text("\(exercise.wrappedValue.sets)")
+                            .font(.spotterBodyMedium)
+                            .foregroundStyle(Color.spotterText)
+                            .frame(width: 32)
+
+                        Button {
+                            if exercise.wrappedValue.sets < 10 {
+                                exercise.wrappedValue.sets += 1
+                                HapticManager.selection()
+                            }
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Color.spotterTextSecondary)
+                                .frame(width: 28, height: 28)
+                                .background(Color.spotterSurface)
+                        }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.xs))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CornerRadius.xs)
+                            .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                    )
+                }
 
                 Spacer()
 
-                TextField("Reps", text: exercise.reps)
-                    .frame(width: 60)
+                // Reps
+                HStack(spacing: Spacing.xs) {
+                    Text("Reps:")
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+
+                    TextField("8-12", text: exercise.reps)
+                        .font(.spotterBody)
+                        .foregroundStyle(Color.spotterText)
+                        .frame(width: 60)
+                        .padding(.horizontal, Spacing.xs)
+                        .padding(.vertical, Spacing.xs)
+                        .background(Color.spotterSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.xs))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CornerRadius.xs)
+                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                        )
+                }
+            }
+        }
+        .padding(Spacing.sm)
+        .background(Color.spotterSurface.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+    }
+
+    private var notesSection: some View {
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                SectionHeader("Notes", subtitle: "Optional")
+
+                TextField("Any notes about this plan...", text: $notes, axis: .vertical)
+                    .font(.spotterBody)
+                    .foregroundStyle(Color.spotterText)
                     .padding(Spacing.sm)
+                    .background(Color.spotterSurface)
+                    .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
                     .overlay(
                         RoundedRectangle(cornerRadius: CornerRadius.sm)
                             .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
                     )
+                    .lineLimit(3...6)
             }
         }
-        .padding(.vertical, Spacing.xs)
     }
 
     private func addDay() {
         let dayNumber = days.count + 1
-        days.append(DayEntry(
+        let newDay = DayEntry(
             name: "Day \(dayNumber)",
             exercises: [ExerciseEntry(name: "", sets: 3, reps: "8-12")]
-        ))
+        )
+        days.append(newDay)
+        expandedDayId = newDay.id
+        HapticManager.selection()
     }
 
     private func savePlan() {

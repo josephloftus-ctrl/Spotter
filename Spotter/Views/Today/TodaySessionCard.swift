@@ -4,31 +4,49 @@ struct TodaySessionCard: View {
     let planDay: PlanDay
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("Today's Plan")
-                .font(.spotterLabel)
-                .foregroundStyle(Color.spotterTextSecondary)
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                SectionHeader("Today's Plan", subtitle: "\(planDay.sortedExercises.count) exercises")
 
-            VStack(spacing: 0) {
-                ForEach(planDay.sortedExercises) { exercise in
-                    exerciseRow(exercise)
+                VStack(spacing: 0) {
+                    ForEach(Array(planDay.sortedExercises.enumerated()), id: \.element.id) { index, exercise in
+                        exerciseRow(exercise, index: index + 1)
+
+                        if index < planDay.sortedExercises.count - 1 {
+                            SpotterDivider()
+                                .padding(.leading, 40)
+                        }
+                    }
                 }
             }
         }
-        .padding(Spacing.md)
-        .background(Color.spotterSurface)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
-    private func exerciseRow(_ exercise: PlannedExercise) -> some View {
-        HStack {
-            Text(exercise.exerciseName)
-                .font(.spotterBody)
-                .foregroundStyle(Color.spotterText)
+    private func exerciseRow(_ exercise: PlannedExercise, index: Int) -> some View {
+        HStack(spacing: Spacing.sm) {
+            // Exercise number badge
+            Text("\(index)")
+                .font(.spotterCaptionMedium)
+                .foregroundStyle(Color.spotterTextMuted)
+                .frame(width: 24, height: 24)
+                .background(Color.spotterSurface)
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.exerciseName)
+                    .font(.spotterBodyMedium)
+                    .foregroundStyle(Color.spotterText)
+
+                Text(exercise.displayPrescription)
+                    .font(.spotterCaption)
+                    .foregroundStyle(Color.spotterTextMuted)
+            }
+
             Spacer()
-            Text(exercise.displayPrescription)
-                .font(.spotterCaption)
-                .foregroundStyle(Color.spotterTextSecondary)
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.spotterTextMuted)
         }
         .padding(.vertical, Spacing.sm)
     }
@@ -39,4 +57,5 @@ struct TodaySessionCard: View {
 
     return TodaySessionCard(planDay: planDay)
         .padding()
+        .background(Color.spotterBackground)
 }

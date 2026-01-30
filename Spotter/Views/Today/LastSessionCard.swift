@@ -4,58 +4,81 @@ struct LastSessionCard: View {
     let session: Session
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            HStack {
-                Text("Last Session")
-                    .font(.spotterLabel)
-                    .foregroundStyle(Color.spotterTextSecondary)
-                Spacer()
-                Text(DateFormatters.formatRelativeDate(session.date))
-                    .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterTextSecondary)
-            }
+        SpotterCard {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                // Header
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: Spacing.xxs) {
+                        Text("Last Session")
+                            .font(.spotterCaptionMedium)
+                            .foregroundStyle(Color.spotterTextSecondary)
+                            .textCase(.uppercase)
+                            .tracking(0.5)
 
-            if let planDayName = session.planDayName {
-                Text(planDayName)
-                    .font(.spotterHeadline)
-                    .foregroundStyle(Color.spotterText)
-            }
+                        if let planDayName = session.planDayName {
+                            Text(planDayName)
+                                .font(.spotterHeadline)
+                                .foregroundStyle(Color.spotterText)
+                        }
+                    }
 
-            HStack(spacing: Spacing.lg) {
-                statItem(
-                    value: "\(session.exerciseCount)",
-                    label: "exercises"
-                )
+                    Spacer()
 
-                if let duration = session.duration {
-                    statItem(
-                        value: DateFormatters.formatDuration(duration),
-                        label: "duration"
-                    )
+                    Text(DateFormatters.formatRelativeDate(session.date))
+                        .font(.spotterCaption)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .padding(.horizontal, Spacing.sm)
+                        .padding(.vertical, Spacing.xxs)
+                        .background(Color.spotterSurface)
+                        .clipShape(Capsule())
                 }
 
-                if let rpe = session.sessionRPE {
-                    statItem(
-                        value: "\(rpe)/5",
-                        label: "feel"
+                SpotterDivider()
+
+                // Stats row
+                HStack(spacing: 0) {
+                    sessionStat(
+                        value: "\(session.exerciseCount)",
+                        label: "Exercises",
+                        icon: "dumbbell.fill"
                     )
+
+                    if let duration = session.duration {
+                        Spacer()
+                        sessionStat(
+                            value: DateFormatters.formatDuration(duration),
+                            label: "Duration",
+                            icon: "clock.fill"
+                        )
+                    }
+
+                    if let rpe = session.sessionRPE {
+                        Spacer()
+                        sessionStat(
+                            value: "\(rpe)/5",
+                            label: "Feel",
+                            icon: "heart.fill"
+                        )
+                    }
                 }
             }
-            .padding(.top, Spacing.xs)
         }
-        .padding(Spacing.md)
-        .background(Color.spotterSurface)
-        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.md))
     }
 
-    private func statItem(value: String, label: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(value)
-                .font(.spotterHeadline)
-                .foregroundStyle(Color.spotterText)
-            Text(label)
-                .font(.spotterCaption)
-                .foregroundStyle(Color.spotterTextSecondary)
+    private func sessionStat(value: String, label: String, icon: String) -> some View {
+        HStack(spacing: Spacing.xs) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(Color.spotterTextMuted)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value)
+                    .font(.spotterBodyMedium)
+                    .foregroundStyle(Color.spotterText)
+                Text(label)
+                    .font(.spotterCaption)
+                    .foregroundStyle(Color.spotterTextMuted)
+            }
         }
     }
 }
@@ -69,4 +92,5 @@ struct LastSessionCard: View {
 
     return LastSessionCard(session: session)
         .padding()
+        .background(Color.spotterBackground)
 }

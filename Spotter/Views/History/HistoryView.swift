@@ -13,48 +13,89 @@ struct HistoryView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // View Toggle
-                Picker("View", selection: $showingCalendar) {
-                    Text("Calendar").tag(true)
-                    Text("List").tag(false)
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.sm)
+            ZStack {
+                Color.spotterBackground.ignoresSafeArea()
 
-                Divider()
-                    .foregroundStyle(Color.spotterBorder)
+                VStack(spacing: 0) {
+                    // Custom segmented control
+                    viewToggle
+                        .padding(.horizontal, Spacing.md)
+                        .padding(.vertical, Spacing.sm)
 
-                if showingCalendar {
-                    CalendarView(sessions: sessions, selectedSession: $selectedSession)
-                } else {
-                    sessionList
+                    if showingCalendar {
+                        CalendarView(sessions: sessions, selectedSession: $selectedSession)
+                    } else {
+                        sessionList
+                    }
                 }
             }
-            .background(Color.spotterBackground)
-            .navigationTitle("History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("HISTORY")
+                        .font(.system(size: 13, weight: .bold, design: .default))
+                        .tracking(3)
+                        .foregroundStyle(Color.spotterTextMuted)
+                }
+            }
             .sheet(item: $selectedSession) { session in
                 SessionDetailView(session: session)
             }
         }
     }
 
+    private var viewToggle: some View {
+        HStack(spacing: 0) {
+            toggleButton(title: "Calendar", icon: "calendar", isSelected: showingCalendar) {
+                withAnimation(SpotterAnimation.quick) {
+                    showingCalendar = true
+                }
+            }
+
+            toggleButton(title: "List", icon: "list.bullet", isSelected: !showingCalendar) {
+                withAnimation(SpotterAnimation.quick) {
+                    showingCalendar = false
+                }
+            }
+        }
+        .padding(4)
+        .background(Color.spotterSurface)
+        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+    }
+
+    private func toggleButton(title: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.selection()
+            action()
+        } label: {
+            HStack(spacing: Spacing.xs) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                Text(title)
+                    .font(.spotterCaptionMedium)
+            }
+            .foregroundStyle(isSelected ? Color.spotterText : Color.spotterTextMuted)
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.xs)
+            .background(isSelected ? Color.spotterSurfaceElevated : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: CornerRadius.xs))
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     private var sessionList: some View {
         ScrollView {
-            LazyVStack(spacing: 0) {
+            LazyVStack(spacing: Spacing.sm) {
                 ForEach(sessions) { session in
                     SessionRowView(session: session)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             selectedSession = session
+                            HapticManager.selection()
                         }
-
-                    Divider()
-                        .foregroundStyle(Color.spotterBorder)
                 }
             }
-            .padding(.horizontal, Spacing.md)
+            .padding(Spacing.md)
         }
     }
 }
@@ -63,40 +104,87 @@ struct SessionRowView: View {
     let session: Session
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text(DateFormatters.formatRelativeDate(session.date))
-                    .font(.spotterHeadline)
-                    .foregroundStyle(Color.spotterText)
-
-                if let planDayName = session.planDayName {
-                    Text(planDayName)
-                        .font(.spotterCaption)
-                        .foregroundStyle(Color.spotterTextSecondary)
-                }
-            }
-
-            Spacer()
-
+        SpotterCard {
             HStack(spacing: Spacing.md) {
-                if let duration = session.duration {
-                    Text(DateFormatters.formatDuration(duration))
+                // Date indicator
+                VStack(spacing: 2) {
+                    Text(dayOfMonth)
+                        .font(.spotterMediumNumber)
+                        .foregroundStyle(Color.spotterText)
+                    Text(monthAbbrev)
                         .font(.spotterCaption)
-                        .foregroundStyle(Color.spotterTextSecondary)
+                        .foregroundStyle(Color.spotterTextMuted)
+                        .textCase(.uppercase)
+                }
+                .frame(width: 50)
+
+                SpotterDivider()
+                    .frame(height: 40)
+
+                // Session info
+                VStack(alignment: .leading, spacing: Spacing.xxs) {
+                    if let planDayName = session.planDayName {
+                        Text(planDayName)
+                            .font(.spotterBodyMedium)
+                            .foregroundStyle(Color.spotterText)
+                    } else {
+                        Text("Quick Session")
+                            .font(.spotterBodyMedium)
+                            .foregroundStyle(Color.spotterText)
+                    }
+
+                    HStack(spacing: Spacing.sm) {
+                        if let duration = session.duration {
+                            Label(DateFormatters.formatDuration(duration), systemImage: "clock")
+                        }
+
+                        Label("\(session.sets.count) sets", systemImage: "square.stack")
+                    }
+                    .font(.spotterCaption)
+                    .foregroundStyle(Color.spotterTextMuted)
                 }
 
+                Spacer()
+
+                // Feel indicator
                 if let rpe = session.sessionRPE {
-                    Text(rpeEmoji(rpe))
+                    feelIndicator(rpe: rpe)
                 }
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.spotterTextMuted)
             }
         }
-        .padding(.vertical, Spacing.md)
     }
 
-    private func rpeEmoji(_ rpe: Int) -> String {
-        let emojis = ["😫", "😓", "😐", "💪", "🔥"]
-        guard rpe >= 1 && rpe <= 5 else { return "" }
-        return emojis[rpe - 1]
+    private var dayOfMonth: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter.string(from: session.date)
+    }
+
+    private var monthAbbrev: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM"
+        return formatter.string(from: session.date)
+    }
+
+    private func feelIndicator(rpe: Int) -> some View {
+        let color: Color = {
+            switch rpe {
+            case 1: return .spotterRPE10
+            case 2: return .spotterRPE9
+            case 3: return .spotterRPE8
+            case 4: return .spotterRPE7
+            case 5: return .spotterSuccess
+            default: return .spotterTextMuted
+            }
+        }()
+
+        return Circle()
+            .fill(color)
+            .frame(width: 12, height: 12)
     }
 }
 

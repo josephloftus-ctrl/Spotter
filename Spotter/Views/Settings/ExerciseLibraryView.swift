@@ -31,30 +31,50 @@ struct ExerciseLibraryView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                // Modality Filter
-                Section {
+            ZStack {
+                Color.spotterBackground.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    // Modality Filter
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.sm) {
-                            filterChip(nil, label: "All")
+                            SpotterChip(label: "All", isSelected: selectedModality == nil) {
+                                selectedModality = nil
+                            }
 
                             ForEach(ExerciseModality.allCases, id: \.self) { modality in
-                                filterChip(modality, label: modality.displayName)
+                                SpotterChip(
+                                    label: modality.displayName,
+                                    isSelected: selectedModality == modality
+                                ) {
+                                    selectedModality = modality
+                                }
                             }
                         }
                         .padding(.horizontal, Spacing.md)
+                        .padding(.vertical, Spacing.sm)
                     }
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-                }
+                    .background(Color.spotterSurface)
 
-                // Exercises
-                ForEach(groupedExercises, id: \.0) { modality, exercises in
-                    Section(modality.displayName) {
-                        ForEach(exercises) { exercise in
-                            exerciseRow(exercise)
+                    // Exercise List
+                    List {
+                        ForEach(groupedExercises, id: \.0) { modality, exercises in
+                            Section {
+                                ForEach(exercises) { exercise in
+                                    exerciseRow(exercise)
+                                        .listRowBackground(Color.spotterSurfaceElevated)
+                                }
+                            } header: {
+                                Text(modality.displayName)
+                                    .font(.spotterCaptionMedium)
+                                    .foregroundStyle(Color.spotterTextSecondary)
+                                    .textCase(.uppercase)
+                                    .tracking(0.5)
+                            }
                         }
                     }
+                    .listStyle(.insetGrouped)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .searchable(text: $searchText, prompt: "Search exercises")
@@ -62,16 +82,20 @@ struct ExerciseLibraryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.spotterTextSecondary)
                     }
-                    .foregroundStyle(Color.spotterPrimary)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showingAddExercise = true
                     } label: {
                         Image(systemName: "plus")
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(Color.spotterPrimary)
                     }
                 }
@@ -82,41 +106,27 @@ struct ExerciseLibraryView: View {
         }
     }
 
-    private func filterChip(_ modality: ExerciseModality?, label: String) -> some View {
-        Button {
-            selectedModality = modality
-            HapticManager.selection()
-        } label: {
-            Text(label)
-                .font(.spotterCaption)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.sm)
-                .background(
-                    RoundedRectangle(cornerRadius: CornerRadius.sm)
-                        .fill(selectedModality == modality ? Color.spotterPrimary : Color.clear)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: CornerRadius.sm)
-                        .strokeBorder(selectedModality == modality ? Color.clear : Color.spotterBorder, lineWidth: BorderWidth.thin)
-                )
-                .foregroundStyle(selectedModality == modality ? .white : Color.spotterText)
-        }
-    }
-
     private func exerciseRow(_ exercise: Exercise) -> some View {
-        HStack {
-            Image(systemName: exercise.modality.icon)
-                .foregroundStyle(Color.spotterTextSecondary)
+        HStack(spacing: Spacing.sm) {
+            ZStack {
+                Circle()
+                    .fill(Color.spotterSurface)
+                    .frame(width: 40, height: 40)
 
-            VStack(alignment: .leading, spacing: Spacing.xs) {
+                Image(systemName: exercise.modality.icon)
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.spotterTextMuted)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
                 Text(exercise.name)
-                    .font(.spotterBody)
+                    .font(.spotterBodyMedium)
                     .foregroundStyle(Color.spotterText)
 
                 if !exercise.muscleGroups.isEmpty {
                     Text(exercise.muscleGroups.joined(separator: ", "))
                         .font(.spotterCaption)
-                        .foregroundStyle(Color.spotterTextSecondary)
+                        .foregroundStyle(Color.spotterTextMuted)
                 }
             }
 
@@ -125,9 +135,14 @@ struct ExerciseLibraryView: View {
             if exercise.isCustom {
                 Text("Custom")
                     .font(.spotterCaption)
-                    .foregroundStyle(Color.spotterTextSecondary)
+                    .foregroundStyle(Color.spotterPrimary)
+                    .padding(.horizontal, Spacing.xs)
+                    .padding(.vertical, 2)
+                    .background(Color.spotterPrimaryMuted)
+                    .clipShape(Capsule())
             }
         }
+        .padding(.vertical, Spacing.xxs)
     }
 }
 
@@ -142,35 +157,108 @@ struct AddExerciseView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                TextField("Exercise Name", text: $name)
+            ZStack {
+                Color.spotterBackground.ignoresSafeArea()
 
-                Picker("Type", selection: $modality) {
-                    ForEach(ExerciseModality.allCases, id: \.self) { modality in
-                        Text(modality.displayName).tag(modality)
+                ScrollView {
+                    VStack(spacing: Spacing.lg) {
+                        SpotterCard {
+                            VStack(alignment: .leading, spacing: Spacing.md) {
+                                SectionHeader("Exercise Details")
+
+                                VStack(alignment: .leading, spacing: Spacing.xs) {
+                                    Text("Name")
+                                        .font(.spotterCaptionMedium)
+                                        .foregroundStyle(Color.spotterTextSecondary)
+
+                                    TextField("e.g., Romanian Deadlift", text: $name)
+                                        .font(.spotterBody)
+                                        .foregroundStyle(Color.spotterText)
+                                        .padding(Spacing.sm)
+                                        .background(Color.spotterSurface)
+                                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                                        )
+                                }
+
+                                VStack(alignment: .leading, spacing: Spacing.xs) {
+                                    Text("Type")
+                                        .font(.spotterCaptionMedium)
+                                        .foregroundStyle(Color.spotterTextSecondary)
+
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(spacing: Spacing.sm) {
+                                            ForEach(ExerciseModality.allCases, id: \.self) { mod in
+                                                SpotterChip(
+                                                    label: mod.displayName,
+                                                    isSelected: modality == mod
+                                                ) {
+                                                    modality = mod
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                VStack(alignment: .leading, spacing: Spacing.xs) {
+                                    Text("Muscle Groups")
+                                        .font(.spotterCaptionMedium)
+                                        .foregroundStyle(Color.spotterTextSecondary)
+
+                                    TextField("e.g., hamstrings, glutes, lower back", text: $muscleGroups)
+                                        .font(.spotterBody)
+                                        .foregroundStyle(Color.spotterText)
+                                        .padding(Spacing.sm)
+                                        .background(Color.spotterSurface)
+                                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                                        )
+                                }
+
+                                VStack(alignment: .leading, spacing: Spacing.xs) {
+                                    Text("Notes (Optional)")
+                                        .font(.spotterCaptionMedium)
+                                        .foregroundStyle(Color.spotterTextSecondary)
+
+                                    TextField("Any additional notes...", text: $notes, axis: .vertical)
+                                        .font(.spotterBody)
+                                        .foregroundStyle(Color.spotterText)
+                                        .padding(Spacing.sm)
+                                        .background(Color.spotterSurface)
+                                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CornerRadius.sm)
+                                                .strokeBorder(Color.spotterBorder, lineWidth: BorderWidth.thin)
+                                        )
+                                        .lineLimit(2...4)
+                                }
+                            }
+                        }
+
+                        SpotterButton("Save Exercise", icon: "checkmark", style: .primary) {
+                            saveExercise()
+                        }
+                        .disabled(name.isEmpty)
+                        .opacity(name.isEmpty ? 0.5 : 1.0)
                     }
+                    .padding(Spacing.md)
                 }
-
-                TextField("Muscle Groups (comma separated)", text: $muscleGroups)
-
-                TextField("Notes", text: $notes, axis: .vertical)
-                    .lineLimit(2...4)
             }
             .navigationTitle("Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.spotterTextSecondary)
                     }
-                    .foregroundStyle(Color.spotterPrimary)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        saveExercise()
-                    }
-                    .disabled(name.isEmpty)
-                    .foregroundStyle(name.isEmpty ? Color.spotterTextSecondary : Color.spotterPrimary)
                 }
             }
         }

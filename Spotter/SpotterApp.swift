@@ -30,7 +30,7 @@ struct SpotterApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .preferredColorScheme(.light)
+                .preferredColorScheme(.dark)
                 .onAppear {
                     ExerciseSeeder.seedDefaultExercises(modelContext: sharedModelContainer.mainContext)
                 }
