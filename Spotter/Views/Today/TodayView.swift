@@ -166,7 +166,7 @@ struct TodayView: View {
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
         let dayLabels = ["M", "T", "W", "T", "F", "S", "S"]
 
-        return HStack(spacing: Spacing.sm) {
+        return HStack(spacing: 0) {
             ForEach(0..<7, id: \.self) { dayOffset in
                 let date = calendar.date(byAdding: .day, value: dayOffset, to: weekStart)!
                 let hasSession = sessions.contains { calendar.isDate($0.date, inSameDayAs: date) && $0.isCompleted }
@@ -181,28 +181,28 @@ struct TodayView: View {
                     ZStack {
                         Circle()
                             .fill(hasSession ? Color.spotterSuccess : Color.spotterSurface)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 26, height: 26)
 
                         if hasSession {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(.white)
                         } else if isFuture {
                             Circle()
                                 .fill(Color.spotterBorder)
-                                .frame(width: 6, height: 6)
+                                .frame(width: 5, height: 5)
                         }
 
                         if isToday && !hasSession {
                             Circle()
                                 .strokeBorder(Color.spotterPrimary, lineWidth: 2)
-                                .frame(width: 28, height: 28)
+                                .frame(width: 26, height: 26)
                         }
                     }
                 }
+                .frame(maxWidth: .infinity)
             }
         }
-        .frame(maxWidth: .infinity)
     }
 
     private var actionButtons: some View {

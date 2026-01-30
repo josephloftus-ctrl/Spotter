@@ -1,44 +1,44 @@
 import SwiftUI
 
 // MARK: - Colors
-// "Forge" Design System - Dark, powerful, premium fitness aesthetic
+// "Spotter" Design System - Cool, supportive, friendly gym buddy aesthetic
 
 extension Color {
-    // Core palette - deep charcoal foundation
-    static let spotterBackground = Color(hex: "0D0D0F")      // Near-black with subtle warmth
-    static let spotterSurface = Color(hex: "18181B")         // Elevated surfaces
-    static let spotterSurfaceElevated = Color(hex: "27272A") // Cards, modals
+    // Core palette - deep blue-gray foundation (cool, calm, focused)
+    static let spotterBackground = Color(hex: "0F172A")      // Slate-900: deep but not harsh
+    static let spotterSurface = Color(hex: "1E293B")         // Slate-800: elevated surfaces
+    static let spotterSurfaceElevated = Color(hex: "334155") // Slate-700: cards, modals
 
-    // Primary accent - molten copper/amber (evokes heat, intensity)
-    static let spotterPrimary = Color(hex: "F59E0B")         // Amber-500: energetic, warm
-    static let spotterPrimaryHover = Color(hex: "D97706")    // Amber-600: pressed states
-    static let spotterPrimaryMuted = Color(hex: "F59E0B").opacity(0.15)
+    // Primary accent - teal/cyan (supportive, fresh, energetic)
+    static let spotterPrimary = Color(hex: "06B6D4")         // Cyan-500: friendly, cool
+    static let spotterPrimaryHover = Color(hex: "0891B2")    // Cyan-600: pressed states
+    static let spotterPrimaryMuted = Color(hex: "06B6D4").opacity(0.15)
 
-    // Text hierarchy - crisp whites and warm grays
-    static let spotterText = Color(hex: "FAFAFA")            // Primary text: bright, clean
-    static let spotterTextSecondary = Color(hex: "A1A1AA")   // Zinc-400: readable secondary
-    static let spotterTextMuted = Color(hex: "71717A")       // Zinc-500: tertiary/disabled
+    // Text hierarchy - clean whites and cool grays
+    static let spotterText = Color(hex: "F8FAFC")            // Slate-50: primary text
+    static let spotterTextSecondary = Color(hex: "94A3B8")   // Slate-400: readable secondary
+    static let spotterTextMuted = Color(hex: "64748B")       // Slate-500: tertiary/disabled
 
-    // Borders and dividers - subtle definition
-    static let spotterBorder = Color(hex: "27272A")          // Zinc-800: subtle dividers
-    static let spotterBorderLight = Color(hex: "3F3F46")     // Zinc-700: more prominent
+    // Borders and dividers - subtle cool definition
+    static let spotterBorder = Color(hex: "334155")          // Slate-700: subtle dividers
+    static let spotterBorderLight = Color(hex: "475569")     // Slate-600: more prominent
 
-    // Semantic colors - vibrant but not garish
-    static let spotterSuccess = Color(hex: "22C55E")         // Green-500: achievements
-    static let spotterSuccessMuted = Color(hex: "22C55E").opacity(0.15)
-    static let spotterWarning = Color(hex: "EAB308")         // Yellow-500: caution
-    static let spotterError = Color(hex: "EF4444")           // Red-500: errors
+    // Semantic colors - friendly and clear
+    static let spotterSuccess = Color(hex: "10B981")         // Emerald-500: achievements
+    static let spotterSuccessMuted = Color(hex: "10B981").opacity(0.15)
+    static let spotterWarning = Color(hex: "F59E0B")         // Amber-500: caution
+    static let spotterError = Color(hex: "F87171")           // Red-400: softer error
 
-    // RPE intensity gradient - heat scale
-    static let spotterRPE6 = Color(hex: "22C55E")            // Green: easy
-    static let spotterRPE7 = Color(hex: "84CC16")            // Lime: moderate
-    static let spotterRPE8 = Color(hex: "EAB308")            // Yellow: challenging
-    static let spotterRPE9 = Color(hex: "F97316")            // Orange: hard
-    static let spotterRPE10 = Color(hex: "EF4444")           // Red: max effort
+    // RPE intensity gradient - cool to warm
+    static let spotterRPE6 = Color(hex: "10B981")            // Emerald: easy
+    static let spotterRPE7 = Color(hex: "06B6D4")            // Cyan: moderate
+    static let spotterRPE8 = Color(hex: "FBBF24")            // Amber: challenging
+    static let spotterRPE9 = Color(hex: "FB923C")            // Orange: hard
+    static let spotterRPE10 = Color(hex: "F87171")           // Red: max effort
 
-    // Gradient stops for premium effects
-    static let spotterGradientStart = Color(hex: "F59E0B")   // Amber
-    static let spotterGradientEnd = Color(hex: "DC2626")     // Red-600
+    // Gradient stops - cool supportive vibe
+    static let spotterGradientStart = Color(hex: "06B6D4")   // Cyan
+    static let spotterGradientEnd = Color(hex: "8B5CF6")     // Violet-500
 
     // Hex initializer
     init(hex: String) {
@@ -90,50 +90,50 @@ extension LinearGradient {
 }
 
 // MARK: - Fonts
-// Bold, confident typography with dramatic weight contrast
+// Clean, friendly typography - readable and approachable
 
 extension Font {
-    // Display - massive, impactful (for hero numbers, main metrics)
-    static let spotterDisplay = Font.system(size: 56, weight: .bold, design: .rounded)
+    // Display - big but not overwhelming
+    static let spotterDisplay = Font.system(size: 44, weight: .bold, design: .rounded)
 
-    // Title - commanding presence
-    static let spotterTitle = Font.system(size: 28, weight: .bold, design: .rounded)
-    static let spotterTitleSecondary = Font.system(size: 22, weight: .semibold, design: .rounded)
+    // Title - clear hierarchy
+    static let spotterTitle = Font.system(size: 24, weight: .bold, design: .rounded)
+    static let spotterTitleSecondary = Font.system(size: 20, weight: .semibold, design: .rounded)
 
-    // Headline - section headers, important labels
+    // Headline - section headers
     static let spotterHeadline = Font.system(size: 17, weight: .semibold, design: .default)
 
-    // Body - primary reading text
+    // Body - comfortable reading
     static let spotterBody = Font.system(size: 16, weight: .regular, design: .default)
     static let spotterBodyMedium = Font.system(size: 16, weight: .medium, design: .default)
 
-    // Caption - secondary info, metadata
+    // Caption - secondary info
     static let spotterCaption = Font.system(size: 13, weight: .regular, design: .default)
     static let spotterCaptionMedium = Font.system(size: 13, weight: .medium, design: .default)
 
-    // Label - UI elements, buttons
-    static let spotterLabel = Font.system(size: 15, weight: .semibold, design: .default)
+    // Label - buttons, UI elements
+    static let spotterLabel = Font.system(size: 16, weight: .semibold, design: .default)
 
-    // Large numbers - workout metrics (weight, reps)
-    static let spotterLargeNumber = Font.system(size: 64, weight: .bold, design: .rounded)
-    static let spotterMediumNumber = Font.system(size: 36, weight: .bold, design: .rounded)
+    // Large numbers - scaled down for better fit
+    static let spotterLargeNumber = Font.system(size: 48, weight: .bold, design: .rounded)
+    static let spotterMediumNumber = Font.system(size: 32, weight: .bold, design: .rounded)
 
     // Monospace for timers
-    static let spotterTimer = Font.system(size: 20, weight: .medium, design: .monospaced)
+    static let spotterTimer = Font.system(size: 18, weight: .medium, design: .monospaced)
 }
 
 // MARK: - Spacing
-// Generous spacing for touch targets and visual breathing room
+// Comfortable spacing - room to breathe
 
 enum Spacing {
     static let xxs: CGFloat = 4
     static let xs: CGFloat = 8
     static let sm: CGFloat = 12
     static let md: CGFloat = 16
-    static let lg: CGFloat = 24
-    static let xl: CGFloat = 32
-    static let xxl: CGFloat = 48
-    static let xxxl: CGFloat = 64
+    static let lg: CGFloat = 20
+    static let xl: CGFloat = 28
+    static let xxl: CGFloat = 40
+    static let xxxl: CGFloat = 56
 }
 
 // MARK: - Corner Radius

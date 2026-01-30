@@ -94,7 +94,7 @@ struct SpotterCard<Content: View>: View {
 
     init(
         accentEdge: Edge? = nil,
-        padding: CGFloat = Spacing.md,
+        padding: CGFloat = Spacing.lg,
         @ViewBuilder content: () -> Content
     ) {
         self.accentEdge = accentEdge
@@ -296,7 +296,7 @@ struct SpotterStepper: View {
     let unit: String
 
     var body: some View {
-        HStack(spacing: Spacing.lg) {
+        HStack(spacing: Spacing.md) {
             // Decrement
             StepperButton(icon: "minus") {
                 if value - step >= range.lowerBound {
@@ -318,9 +318,9 @@ struct SpotterStepper: View {
                     .font(.spotterCaptionMedium)
                     .foregroundStyle(Color.spotterTextMuted)
                     .textCase(.uppercase)
-                    .tracking(1)
+                    .tracking(0.5)
             }
-            .frame(minWidth: 120)
+            .frame(minWidth: 100)
 
             // Increment
             StepperButton(icon: "plus") {
@@ -346,9 +346,9 @@ struct StepperButton: View {
             action()
         } label: {
             Image(systemName: icon)
-                .font(.system(size: 24, weight: .semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(isEnabled ? Color.spotterPrimary : Color.spotterTextMuted)
-                .frame(width: 56, height: 56)
+                .frame(width: 52, height: 52)
                 .background(Color.spotterSurface)
                 .clipShape(Circle())
                 .overlay(
@@ -358,7 +358,7 @@ struct StepperButton: View {
                             lineWidth: BorderWidth.thin
                         )
                 )
-                .scaleEffect(isPressed ? 0.9 : 1.0)
+                .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
         .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
@@ -375,13 +375,11 @@ struct RPESelector: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text("RPE")
-                .font(.spotterCaptionMedium)
+            Text("RPE (optional)")
+                .font(.spotterCaption)
                 .foregroundStyle(Color.spotterTextSecondary)
-                .textCase(.uppercase)
-                .tracking(0.5)
 
-            HStack(spacing: Spacing.sm) {
+            HStack(spacing: Spacing.xs) {
                 ForEach(rpeValues, id: \.self) { rpe in
                     RPEButton(
                         value: rpe,
@@ -421,9 +419,9 @@ struct RPEButton: View {
             action()
         } label: {
             Text("\(value)")
-                .font(.spotterLabel)
+                .font(.spotterBodyMedium)
                 .foregroundStyle(isSelected ? .white : Color.spotterTextSecondary)
-                .frame(width: 48, height: 48)
+                .frame(width: 44, height: 44)
                 .background(
                     Group {
                         if isSelected {
@@ -441,7 +439,7 @@ struct RPEButton: View {
                             lineWidth: BorderWidth.thin
                         )
                 )
-                .scaleEffect(isPressed ? 0.9 : 1.0)
+                .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
         .pressEvents(onPress: { isPressed = true }, onRelease: { isPressed = false })
