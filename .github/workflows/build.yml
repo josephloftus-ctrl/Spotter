@@ -21,13 +21,41 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
 
+    - name: List available simulators
+      run: |
+        xcrun simctl list devices available
+        xcrun simctl list runtimes
+
+    - name: Create iOS 26 simulator if needed
+      run: |
+        # Check if iOS 26 runtime exists
+        if xcrun simctl list runtimes | grep -q "iOS 26"; then
+          echo "iOS 26 runtime found"
+          # Create iPhone 16 Pro simulator if it doesn't exist
+          if ! xcrun simctl list devices | grep -q "iPhone 16 Pro.*iOS 26"; then
+            RUNTIME_ID=$(xcrun simctl list runtimes | grep "iOS 26" | head -1 | awk -F'[()]' '{print $2}' | awk '{print $NF}')
+            echo "Creating iPhone 16 Pro with runtime: $RUNTIME_ID"
+            xcrun simctl create "iPhone 16 Pro" "iPhone 16 Pro" "$RUNTIME_ID" || true
+          fi
+        else
+          echo "iOS 26 runtime not found, will use generic destination"
+        fi
+        xcrun simctl list devices available
+
     - name: Build for iOS Simulator
       run: |
         set -o pipefail
+        # Try to find an available iOS 26 simulator, fall back to generic
+        if xcrun simctl list devices available | grep -q "iPhone.*Booted\|iPhone 16 Pro"; then
+          DESTINATION='platform=iOS Simulator,name=iPhone 16 Pro'
+        else
+          DESTINATION='generic/platform=iOS Simulator'
+        fi
+        echo "Using destination: $DESTINATION"
         xcodebuild clean build \
           -project Spotter.xcodeproj \
           -scheme Spotter \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=26.2' \
+          -destination "$DESTINATION" \
           -configuration Debug \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
